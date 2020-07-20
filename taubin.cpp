@@ -132,7 +132,9 @@ void connected_components(
  	std::vector<std::vector<int>>& sub_meshes
 ){
 	std::map<int, std::vector<int>*> where_are_you; // Which partition is the face in
-	for(int tid=0; tid<tiles.rows(); tid++)
+	int tid;
+	const int tilesRowNum = tiles.rows(); 
+	for(tid = 0; tid < tilesRowNum; tid++)
 	{
 		// At first, the partition of the mesh is 
 		// a collection of singletons of the fids
@@ -143,16 +145,20 @@ void connected_components(
 
 	// Get all the edges in the mesh
 	std::map<std::pair<int,int>, std::vector<int>> incident_tiles;
-  edge_incident_faces(tiles, incident_tiles);
-
+  	edge_incident_faces(tiles, incident_tiles);
+	
+	int tid1;
+	int tid2;
 	std::map<std::pair<int,int>, std::vector<int>>::iterator it = incident_tiles.begin();
-	while (it != incident_tiles.end())
+	const std::map<std::pair<int,int>, std::vector<int>>::iterator incidentTilesEnd = incident_tiles.end();
+	std::vector<int>* temp_1;
+	while (it != incidentTilesEnd)
 	{
 		assert((it->second).size()<=2);
 		if((it->second).size()==2)
 		{
-			int tid1 = it->second[0];
-			int tid2 = it->second[1];
+			tid1 = it->second[0];
+			tid2 = it->second[1];
 			if(where_are_you[tid1]!=where_are_you[tid2])
 			{
 				assert(where_are_you[tid1]!=NULL && where_are_you[2]!=NULL);
@@ -162,10 +168,8 @@ void connected_components(
 					where_are_you[tid2]->begin(),
 					where_are_you[tid2]->end()
 				);
-				std::vector<int>* temp;
-				temp = where_are_you[tid2];
+				temp_1 = where_are_you[tid2];
 				where_are_you[tid2] = where_are_you[tid1];
-				delete temp;
 			}
 			else
 			{
@@ -174,21 +178,24 @@ void connected_components(
 		}
 		it++;
 	}
+	delete temp_1;
 
 	std::cout << "Find unique submeshes" << std::endl;
-	for(int tid=0; tid<tiles.rows(); tid++)
+	std::vector<int>* temp_2;
+	size_t i;
+	for(tid = 0; tid < tilesRowNum; tid++)
 	{
 		if(where_are_you[tid] != NULL)
 		{
-			std::vector<int>* temp = where_are_you[tid];
-			sub_meshes.emplace_back(*temp);
-			for(size_t i=0; i<temp->size(); i++)
+			temp_2 = where_are_you[tid];
+			sub_meshes.emplace_back(*temp_2);
+			for(i=0; i<temp_2->size(); i++)
 			{
-				where_are_you[ temp->at(i) ] = NULL;
+				where_are_you[ temp_2->at(i) ] = NULL;
 			}
-			delete temp;
 		}
 	}
+	delete temp_2;
 };
 
 // Determine whether input connected component
