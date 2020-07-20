@@ -15,6 +15,12 @@ void edge_incident_faces(
 	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
 );
 
+void get_edges_and_neighbours(
+	const Eigen::MatrixXi& F,
+	std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
+	std::map<std::pair<int,int>, std::vector<int>>& neighbouring_vertices
+);
+
 //Sort an array of three entries
 void sort3(int arr[]);
 

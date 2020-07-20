@@ -16,7 +16,7 @@ int main(int argc, char * argv[])
   Eigen::MatrixXi F, OF;
   Eigen::MatrixXd V, OV;
 
-  // inline mesh of a tetrahedron
+  // Inline mesh of a tetrahedron
   // OV = (Eigen::MatrixXd(4,3)<<
   //   0.0,0.0,0.0,
   //   1.0,0.0,0.0,
@@ -28,10 +28,10 @@ int main(int argc, char * argv[])
   //   1,4,2,
   //   2,4,3).finished().array()-1; // Test
 
+  // Inline mesh of a regular hexagon mesh
   double x = std::sqrt(3)/2.;
   double y = 0.5;
   double l = 1.;
-
   OV = (Eigen::MatrixXd(7,3)<<
     y,-x,0,
     1,0,0,
@@ -49,9 +49,9 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
-  string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
-  const string mesh_path = repo_path + "knightloop.off";
-  igl::read_triangle_mesh(mesh_path,OV,OF);
+  // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
+  // const string mesh_path = repo_path + "knightloop.off";
+  // igl::read_triangle_mesh(mesh_path,OV,OF);
 
   V = OV;
   F = OF;
@@ -87,9 +87,6 @@ int main(int argc, char * argv[])
         case '3':
         {
           igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-          cout<<"Number of vertices is: " << V.rows() << endl;
-          cout<<"-------"<<endl;
-          // igl::writeOFF("/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/knightloop.off", V, F);
           break;
         }
         case '4':
@@ -105,17 +102,26 @@ int main(int argc, char * argv[])
       return true;
     };
 
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
-	Eigen::MatrixXi F_old;
-	Eigen::MatrixXd V_old;
-	Eigen::MatrixXi F_new;
-	Eigen::MatrixXd V_new;
-  if(is_quadrisection(F, V, F_old, V_old, F_new, V_new))
-  {
-    V = V_old;
-    F = F_old;
+	// Eigen::MatrixXi F_old;
+	// Eigen::MatrixXd V_old;
+	// Eigen::MatrixXi F_new;
+	// Eigen::MatrixXd V_new;
+
+  std::vector<int> v_old; // vids from V_in that make up the coarse mesh
+  std::vector<int> v_new; // vids in V_in that through subdivision make up the new mesh
+  Eigen::MatrixXi F_coarse; // matrix whos e rows are vids in V_in that make up the coarse mesh
+  Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
+  if(is_quadrisection(
+    F, 
+    V, 
+    v_old, 
+    F_coarse, 
+    fids_covered_by_F_coarse
+  )) {
+    F = F_coarse;
     viewer.data().clear();
     viewer.data().set_mesh(V,F);
     viewer.data().set_face_based(true);
