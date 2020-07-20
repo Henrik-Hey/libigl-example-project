@@ -1,17 +1,10 @@
 #include "taubin.h"
-#include <igl/upsample.h>
+#include "utils.h"
+#include <igl/loop.h>
 #include <iostream>
 #include <vector>
 #include <map>
 
-// Adapted from Gabriel Taubin's Loop Inverse Subdivsion Algorithm
-// Paper: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.21.1125&rep=rep1&type=pdf
-
-// Detect whether the input mesh has subdivision connectivity.
-// If so, partitions the input mesh into the coarse 
-// mesh and the new vertices after subdividing.
-// Returns true if has subdivision connectivity,
-// false if not.
 bool is_quadrisection(
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXd& V_in,
@@ -51,8 +44,6 @@ bool is_quadrisection(
 	return false;
 };
 
-// Creates tiles from the input mesh,
-// And the tile sets covered by each
 void covering_mesh(
 	const Eigen::MatrixXi& F_in,
  	Eigen::MatrixXi& tiles, // num_tilesx3 matrix of vert ids in V_in
@@ -88,9 +79,6 @@ void covering_mesh(
 
 		if(isRegular)
 		{
-			// std::cout << "e1: " << incident_faces[e1][0] << " " << incident_faces[e1][1] << std::endl;
-			// std::cout << "e2: " << incident_faces[e2][0] << " " << incident_faces[e2][1] << std::endl;
-			// std::cout << "e3: " << incident_faces[e3][0] << " " << incident_faces[e3][1] << std::endl;
 			// Neighbouring triangles to current triangle
 			int nt1 = incident_faces[e1][0]==f ? incident_faces[e1][1] : incident_faces[e1][0];
 			int nt2 = incident_faces[e2][0]==f ? incident_faces[e2][1] : incident_faces[e2][0];
@@ -125,8 +113,6 @@ void covering_mesh(
 	std::cout << "Num tiles: " << tiles.rows() << std::endl;
 };
 
-// Generate all possible connected 
-// components from the tiles
 void connected_components(
 	const Eigen::MatrixXi& tiles,
  	std::vector<std::vector<int>>& sub_meshes // Vector of vectors containing tile ids in a single connected component found
@@ -199,8 +185,6 @@ void connected_components(
 	}
 };
 
-// Determine whether input connected component
-// has a bijection to the original mesh
 void is_equivalence(
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXd& V_in,
@@ -329,7 +313,7 @@ void is_equivalence(
 				Eigen::MatrixXd V_pre_subdiv = Eigen::MatrixXd(submesh_vertices);
 
 				// Subdivide the candidate
-				igl::upsample( Eigen::MatrixXd(
+				igl::loop( Eigen::MatrixXd(
 					Eigen::MatrixXd(submesh_vertices)), 
 					Eigen::MatrixXi(submesh), 
 					submesh_vertices, 
@@ -350,42 +334,4 @@ void is_equivalence(
 			std::cout << "Second test failed." << std::endl; 
 		}
 	}
-};
-
-// Given input mesh, return a map with keys.
-// Each key is an ordered pair of vertex 
-// ids (v1 comes before v2 if |v1| > |v2|)
-// and maps to a list of face ids of 
-// all the faces incident to the edge
-// formed by v1 and v2.
-void edge_incident_faces(
-	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
-){
-	for(int f=0; f<F.rows(); f++)
-	{
-		int v1 = F(f,0);
-		int v2 = F(f,1);
-		int v3 = F(f,2);
-
-		incident_faces[std::make_pair(std::min(v1,v2),std::max(v1,v2))].push_back(f);
-		incident_faces[std::make_pair(std::min(v2,v3),std::max(v2,v3))].push_back(f);
-		incident_faces[std::make_pair(std::min(v3,v1),std::max(v3,v1))].push_back(f);
-	}
-};
-
-// Sort an array of three entries
-void sort3(int arr[]) 
-{ 
-	// Insert arr[1] 
-	if (arr[1] < arr[0]) 
-		std::swap(arr[0], arr[1]); 
-
-	// Insert arr[2] 
-	if (arr[2] < arr[1]) 
-	{ 
-		std::swap(arr[1], arr[2]); 
-		if (arr[1] < arr[0]) 
-			std::swap(arr[1], arr[0]); 
-	} 
 };
