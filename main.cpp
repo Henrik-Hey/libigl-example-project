@@ -106,11 +106,6 @@ int main(int argc, char * argv[])
     };
 
   // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
-  // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
 	Eigen::MatrixXi F_old;
@@ -126,6 +121,27 @@ int main(int argc, char * argv[])
     viewer.data().set_face_based(true);
     viewer.launch();
   }
+
+  /**
+   * Lifting I:
+   * For each boundary vertex in Vold
+   *    Grab the neighbouring boundary vertices in Vnew
+   *    Update the boundary vertex in Vold with the given equation
+  */
+
+  /**
+	 * Lifting II
+	 * For each boundary vertex in Vnew
+	 * 		Get the neighbouring boundary vertices in Vold
+	 * 		Update the position of the Vnew boundary vertex by given equation
+	*/
+
+  /**
+	 * Lifting III
+	 * For each 
+	*/
+
+
   // Henrik takes nice photos
 
 }
