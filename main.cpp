@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "taubin.h"
+#include "lifted_loop_wt.h"
 
 int main(int argc, char * argv[])
 {
@@ -105,29 +106,35 @@ int main(int argc, char * argv[])
   igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
-	// Eigen::MatrixXi F_old;
-	// Eigen::MatrixXd V_old;
-	// Eigen::MatrixXi F_new;
-	// Eigen::MatrixXd V_new;
-
   std::vector<int> v_old; // vids from V_in that make up the coarse mesh
-  std::vector<int> v_new; // vids in V_in that through subdivision make up the new mesh
   Eigen::MatrixXi F_coarse; // matrix whos e rows are vids in V_in that make up the coarse mesh
   Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
   if(is_quadrisection(
     F, 
     V, 
-    v_old, 
-    F_coarse, 
+    v_old,
+    F_coarse,
     fids_covered_by_F_coarse
-  )) {
-    F = F_coarse;
-    viewer.data().clear();
-    viewer.data().set_mesh(V,F);
-    viewer.data().set_face_based(true);
-    viewer.launch();
-  }
+  )){
 
+    // Display the coarser mesh that taubin extracts
+    // F = F_coarse;
+    // viewer.data().clear();
+    // viewer.data().set_mesh(V,F);
+    // viewer.data().set_face_based(true);
+    // viewer.launch();
+
+    Eigen::MatrixXd V_copy = V;
+
+    // Call Lifting 1
+    fwt_lifting1(
+      F, // Connectivity information of the input mesh, referencing V_copy
+      v_old, // vids in V_copy that make up F_coarse 
+      V_copy, // to get manipulated via the lifting scheme
+      F_coarse, // connectivity information between the vids in v_old
+      fids_covered_by_F_coarse // F_coarse.rows() by 4 matrix with each row pointing to the 4 fids it covers
+    );
+  }
   // Henrik takes nice photos
 
 }

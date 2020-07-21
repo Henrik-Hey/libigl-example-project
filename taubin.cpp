@@ -340,7 +340,11 @@ void is_equivalence(
 		} 
 		else
 		{ 
-			std::cout << "Second test failed." << std::endl; 
+			std::cout << "Second test in is_equivalence failed." << std::endl; 
 		}
+	}
+	else 
+	{
+		std::cout << "First test in is_equivalence failed." << std::endl; 
 	}
 };

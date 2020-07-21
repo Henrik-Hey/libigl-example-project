@@ -1,4 +1,5 @@
 #include <Eigen/Core>
+#include <vector>
 
 /**
  * Lifting I:
@@ -7,11 +8,11 @@
  *    Update the boundary vertex in Vold with the given equation
 */
 void fwt_lifting1 (
-	const Eigen::MatrixXi F_old,
-	const Eigen::MatrixXd V_old,
-	const Eigen::MatrixXi F_new,
-	const Eigen::MatrixXd V_new,
-  const Eigen::MatrixXi covered_faces // which faces in F_new 
+	const Eigen::MatrixXi& F_in,
+	const std::vector<int>& v_old, // vids in V_in that make up the old mesh
+	Eigen::MatrixXd& V, // Contains both V_old and V_new
+	Eigen::MatrixXi& F_coarse,
+	Eigen::MatrixXi& fids_covered_by_F_coarse
 );
 
 /**
