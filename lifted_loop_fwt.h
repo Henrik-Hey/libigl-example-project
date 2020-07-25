@@ -2,7 +2,7 @@
 #include <vector>
 
 /**
- * Lifting I:
+ * Lifting I: Update Vold boundary verts with Vnew boundary verts
  * For each boundary vertex in Vold
  *    Grab the neighbouring boundary vertices in Vnew
  *    Update the boundary vertex in Vold with the given equation

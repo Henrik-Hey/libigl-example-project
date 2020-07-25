@@ -134,6 +134,13 @@ int main(int argc, char * argv[])
       fids_covered_by_F_coarse, // F_coarse.rows() by 4 matrix with each row pointing to the 4 fids it covers
       V_copy // to get manipulated via the lifting scheme
     );
+
+    // Visualize the output of the lifting schemes
+    viewer.data().clear();
+    viewer.data().set_mesh(V_copy,F);
+    viewer.data().set_face_based(true);
+    viewer.launch();
+
   }
   // Henrik takes nice photos
 

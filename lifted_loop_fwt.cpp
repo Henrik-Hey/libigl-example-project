@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include "utils.h"
+#include "wei_shangyang_244.h"
 
 void fwt_lifting1 (
 	const Eigen::MatrixXi& F_in,
@@ -29,7 +30,9 @@ void fwt_lifting1 (
     neighbouring_vertices
   );
 
-	for(
+  int v1, v2, v;
+  Eigen::Vector3d v_prime;
+	for( // Iterate over the vold boundary vertices
     std::vector<int>::iterator it = boundary_vertices_vold.begin();
     it != boundary_vertices_vold.end();
     it++
@@ -37,22 +40,34 @@ void fwt_lifting1 (
 
     // Get neighbouring vnew boundary vertex Number 1
     assert(neighbouring_vertices[*it].size()==2);
-    std::cout <<  "vnew1: " << find_boundary_vnew(
-      *it,
+
+    v = *it;
+    v1 = find_boundary_vnew(
+      v,
       neighbouring_vertices[*it][0],
       F_in,
       fids_covered_by_F_coarse,
       incident_faces
-    ) << std::endl;
-
-
-    std::cout << "vnew2: " <<  find_boundary_vnew(
-      *it,
+    );
+    v2 = find_boundary_vnew(
+      v,
       neighbouring_vertices[*it][1],
       F_in,
       fids_covered_by_F_coarse,
       incident_faces
-    ) << std::endl;
+    );
+
+    std::cout <<  "vnew1: " << v1 << std::endl;
+    std::cout <<  "vnew2: " << v2 << std::endl;
+
+    WT_Lifting_1(
+      Eigen::Vector3d(V.row(v)),
+      Eigen::Vector3d(V.row(v1)),
+      Eigen::Vector3d(V.row(v2)),
+      v_prime
+    );
+
+    V.row(v) = v_prime;
 
   }
 
