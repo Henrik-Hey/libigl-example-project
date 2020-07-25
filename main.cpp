@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "taubin.h"
-#include "lifted_loop_wt.h"
+#include "lifted_loop_fwt.h"
 
 int main(int argc, char * argv[])
 {
