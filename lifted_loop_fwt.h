@@ -9,10 +9,11 @@
 */
 void fwt_lifting1 (
 	const Eigen::MatrixXi& F_fine,
-	const std::vector<int>& v_old, // vids in V that make up the old mesh
-	const Eigen::MatrixXi& F_coarse,
 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
-	Eigen::MatrixXd& V // Contains both V_old and V_new
+  const std::map<std::pair<int,int>, std::vector<int>>& edgemap_coarse,
+  const std::map<int, std::vector<int>>& neighbours_coarse,
+  const std::vector<int>& boundary_vids_coarse,
+	Eigen::MatrixXd& V
 );
 
 /**
@@ -22,10 +23,7 @@ void fwt_lifting1 (
  * 		Update the position of the Vnew boundary vertex by given equation
 */
 void fwt_lifting2 (
-	const Eigen::MatrixXi& F_fine,
-	const std::vector<int>& v_old,
-	const Eigen::MatrixXi& F_coarse,
-	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+  const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
 	Eigen::MatrixXd& V
 );
 
@@ -62,6 +60,13 @@ void fwt_lifting2 (
  * 		Grab the 4 vertices in Vold specified by Fig2.16e
  * 		Update the values of those 4 vertices by the given equation
 */
+void fwt_lifting5 (
+	const Eigen::MatrixXi& F_fine,
+	const Eigen::MatrixXi& F_coarse,
+	const std::vector<int>& v_old,
+	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	Eigen::MatrixXd& V
+);
 
 /**                 
  * Lifting VI

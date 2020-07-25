@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "taubin.h"
+#include "utils.h"
 #include "lifted_loop_fwt.h"
 
 int main(int argc, char * argv[])
@@ -124,24 +125,50 @@ int main(int argc, char * argv[])
     // viewer.data().set_face_based(true);
     // viewer.launch();
 
+    // Generate all the edge and neighbour information in F_coarse.
+    // Note that all the vids will be referencing V_copy
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
+    std::map<int, std::vector<int>> neighbours_coarse;
+    edge_incident_faces(
+      F_coarse,
+      edgemap_coarse
+    );
+
+    // Figure out which Vold vids are boundary verts
+    std::vector<int> boundary_vids_coarse;
+    get_boundary_vertices(
+      edgemap_coarse, 
+      boundary_vids_coarse,
+      neighbours_coarse
+    );
+
     Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
 
     // Call Lifting 1
     fwt_lifting1(
-      F, // Connectivity information of the input mesh, referencing V_copy
-      v_old, // vids in V_copy that make up F_coarse 
-      F_coarse, // connectivity information between the vids in v_old
-      fids_covered_by_F_coarse, // F_coarse.rows() by 4 matrix with each row pointing to the 4 fids it covers
-      V_copy // to get manipulated via the lifting scheme
+      F,
+      fids_covered_by_F_coarse,
+      edgemap_coarse,
+      neighbours_coarse,
+      boundary_vids_coarse,
+      V_copy
     );
 
+    // Generate a map from Vnew boundary verts
+    // to its neighbouring boundary verts in Vold
+    std::map<int, std::vector<int>> bound_vnew_to_bound_volds;
+    map_bound_vnew_to_bound_vold(
+      F,
+      fids_covered_by_F_coarse,
+      edgemap_coarse,
+      neighbours_coarse,
+      boundary_vids_coarse,
+      bound_vnew_to_bound_volds
+    );
 
     fwt_lifting2(
-      F,
-      v_old, 
-      F_coarse,
-      fids_covered_by_F_coarse,
-      V_copy
+      bound_vnew_to_bound_volds,
+	    V_copy 
     );
 
     // Visualize the output of the lifting schemes

@@ -48,10 +48,10 @@ int find_boundary_vnew(
 */
 void map_bound_vnew_to_bound_vold(
 	const Eigen::MatrixXi& F_fine,
-	const Eigen::MatrixXi& F_coarse,
-	const Eigen::MatrixXd& V,
-	const std::vector<int>& v_old,
 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+  const std::map<std::pair<int,int>, std::vector<int>>& edgemap_coarse,
+  const std::map<int, std::vector<int>>& neighbours_coarse,
+  const std::vector<int>& boundary_vids_coarse,
 	std::map<int, std::vector<int>>& bound_vnew_to_bound_volds
 );
 
