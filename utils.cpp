@@ -1,5 +1,7 @@
 #include "utils.h"
 #include <iostream>
+#include <map>
+#include <vector>
 
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
