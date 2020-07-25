@@ -7,9 +7,9 @@
 void fwt_lifting1 (
 	const Eigen::MatrixXi& F_in,
 	const std::vector<int>& v_old,
-	Eigen::MatrixXd& V,
-	Eigen::MatrixXi& F_coarse,
-	Eigen::MatrixXi& fids_covered_by_F_coarse
+	const Eigen::MatrixXi& F_coarse,
+	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	Eigen::MatrixXd& V
 ){
   std::cout << "Entered FWT Lifting 1" << std::endl;
 
@@ -58,3 +58,12 @@ void fwt_lifting1 (
 
 };
 
+void fwt_lifting2 (
+	const Eigen::MatrixXi& F_in,
+	const std::vector<int>& v_old,
+	const Eigen::MatrixXi& F_coarse,
+	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	Eigen::MatrixXd& V 
+){
+  
+};

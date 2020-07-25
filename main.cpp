@@ -124,15 +124,15 @@ int main(int argc, char * argv[])
     // viewer.data().set_face_based(true);
     // viewer.launch();
 
-    Eigen::MatrixXd V_copy = V;
+    Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
 
     // Call Lifting 1
     fwt_lifting1(
       F, // Connectivity information of the input mesh, referencing V_copy
       v_old, // vids in V_copy that make up F_coarse 
-      V_copy, // to get manipulated via the lifting scheme
       F_coarse, // connectivity information between the vids in v_old
-      fids_covered_by_F_coarse // F_coarse.rows() by 4 matrix with each row pointing to the 4 fids it covers
+      fids_covered_by_F_coarse, // F_coarse.rows() by 4 matrix with each row pointing to the 4 fids it covers
+      V_copy // to get manipulated via the lifting scheme
     );
   }
   // Henrik takes nice photos
