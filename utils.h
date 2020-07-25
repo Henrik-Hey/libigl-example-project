@@ -42,8 +42,3 @@ int find_boundary_vnew(
 
 //Sort an array of three entries
 void sort3(int arr[]);
-
-void get_boundary_vertices(
-  const Eigen::MatrixXd& V,
-  const Eigen::MatrixXi& F
-);
