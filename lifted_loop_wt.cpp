@@ -12,11 +12,12 @@ void fwt_lifting1 (
 	Eigen::MatrixXi& fids_covered_by_F_coarse
 ){
   std::cout << "Entered FWT Lifting 1" << std::endl;
+
   // Generate all the edge and neighbour information in F_coarse.
   // Note that all the vids will be referencing V_copy
   std::map<std::pair<int,int>, std::vector<int>> incident_faces;
   std::map<int, std::vector<int>> neighbouring_vertices;
-  get_edges_and_neighbours(
+  edge_incident_faces(
 	  F_coarse,
     incident_faces
   );
@@ -56,3 +57,4 @@ void fwt_lifting1 (
   }
 
 };
+

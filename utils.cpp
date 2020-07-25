@@ -17,22 +17,6 @@ void edge_incident_faces(
 	}
 };
 
-void get_edges_and_neighbours(
-	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
-){
-	for(int f=0; f<F.rows(); f++)
-	{
-		int v1 = F(f,0);
-		int v2 = F(f,1);
-		int v3 = F(f,2);
-
-		incident_faces[std::make_pair(std::min(v1,v2),std::max(v1,v2))].emplace_back(f);
-		incident_faces[std::make_pair(std::min(v2,v3),std::max(v2,v3))].emplace_back(f);
-		incident_faces[std::make_pair(std::min(v3,v1),std::max(v3,v1))].emplace_back(f);
-	}
-};
-
 void get_boundary_vertices(
 	std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
 	std::vector<int>& boundary_vertices,
@@ -113,13 +97,6 @@ int find_boundary_vnew(
 	else if(vid11==vid22) v1new = vid11;
 	else if(vid12==vid21) v1new = vid12;
 	else if(vid12==vid22) v1new = vid12;
-
-	// std::cout << "---------" << std::endl;
-	// std::cout << "vid11: " << vid11 << std::endl;
-	// std::cout << "vid12: " << vid12 << std::endl;
-	// std::cout << "vid21: " << vid21 << std::endl;
-	// std::cout << "vid22: " << vid22 << std::endl;
-	// std::cout << "Found common vertex: " << v1new << std::endl;
 
 	return v1new;
 }
