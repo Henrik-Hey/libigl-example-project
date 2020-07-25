@@ -40,5 +40,20 @@ int find_boundary_vnew(
 	std::map<std::pair<int,int>, std::vector<int>> incident_faces
 );
 
+/**
+ * Takes the connectivity of a coarse mesh and fine mesh,
+ * and vertices of the fine mesh, and returns a map
+ * from id of a boundary vert in Vnew to the two neighbouring
+ * boundary verts in Vold
+*/
+void map_bound_vnew_to_bound_vold(
+	const Eigen::MatrixXi& F_fine,
+	const Eigen::MatrixXi& F_coarse,
+	const Eigen::MatrixXd& V,
+	const std::vector<int>& v_old,
+	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	std::map<int, std::vector<int>>& bound_vnew_to_bound_volds
+);
+
 //Sort an array of three entries
 void sort3(int arr[]);

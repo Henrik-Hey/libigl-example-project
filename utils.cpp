@@ -101,7 +101,68 @@ int find_boundary_vnew(
 	else if(vid12==vid22) v1new = vid12;
 
 	return v1new;
-}
+};
+
+void map_bound_vnew_to_bound_vold(
+	const Eigen::MatrixXi& F_fine,
+	const Eigen::MatrixXi& F_coarse,
+	const Eigen::MatrixXd& V,
+	const std::vector<int>& v_old,
+	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	std::map<int, std::vector<int>>& bound_vnew_to_bound_volds
+){
+	// Generate edge map for coarsh mesh
+	std::map<std::pair<int,int>, std::vector<int>> incident_faces;
+  std::map<int, std::vector<int>> neighbouring_vertices;
+  edge_incident_faces(
+	  F_coarse,
+    incident_faces
+  );
+
+	// Find which verts in Vold are boundary verts
+	std::vector<int> boundary_vertices_vold;
+  get_boundary_vertices(
+    incident_faces, 
+    boundary_vertices_vold,
+    neighbouring_vertices
+  );
+
+	// Iterate over each Vold boundary vert and 
+	// find the two Vnew verts that are its neighbours.
+	// While doing so, keep track of which boundary verts in Vold 
+	// neighbour the boundary Vnew verts
+
+  int v1new, v2new, vold;
+	for( // Iterate over the vold boundary vertices
+    std::vector<int>::iterator it = boundary_vertices_vold.begin();
+    it != boundary_vertices_vold.end();
+    it++
+  ){
+
+    // Get neighbouring vnew boundary vertex Number 1
+    assert(neighbouring_vertices[*it].size()==2);
+
+    vold = *it;
+    v1new = find_boundary_vnew(
+      vold,
+      neighbouring_vertices[*it][0],
+      F_fine,
+      fids_covered_by_F_coarse,
+      incident_faces
+    );
+    v2new = find_boundary_vnew(
+      vold,
+      neighbouring_vertices[*it][1],
+      F_fine,
+      fids_covered_by_F_coarse,
+      incident_faces
+    );
+
+		bound_vnew_to_bound_volds[v1new].emplace_back(vold);
+		bound_vnew_to_bound_volds[v2new].emplace_back(vold);
+
+  }
+};
 
 void sort3(int arr[]) 
 { 

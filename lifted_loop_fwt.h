@@ -8,25 +8,25 @@
  *    Update the boundary vertex in Vold with the given equation
 */
 void fwt_lifting1 (
-	const Eigen::MatrixXi& F_in,
-	const std::vector<int>& v_old, // vids in V_in that make up the old mesh
+	const Eigen::MatrixXi& F_fine,
+	const std::vector<int>& v_old, // vids in V that make up the old mesh
 	const Eigen::MatrixXi& F_coarse,
 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
 	Eigen::MatrixXd& V // Contains both V_old and V_new
 );
 
 /**
- * Lifting II
+ * Lifting II: Update Vnew boundary verts with Vold boundary verts
  * For each boundary vertex in Vnew
  * 		Get the neighbouring boundary vertices in Vold
  * 		Update the position of the Vnew boundary vertex by given equation
 */
 void fwt_lifting2 (
-	const Eigen::MatrixXi& F_in,
+	const Eigen::MatrixXi& F_fine,
 	const std::vector<int>& v_old,
 	const Eigen::MatrixXi& F_coarse,
 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
-	Eigen::MatrixXd& V 
+	Eigen::MatrixXd& V
 );
 
 /**                 
