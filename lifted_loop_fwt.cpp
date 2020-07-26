@@ -91,6 +91,58 @@ void fwt_lifting2 (
   std::cout << "Completed FWT Lifting 2" << std::endl;
 };
 
+void fwt_lifting3 (
+  const std::map<int, std::vector<int>>& neighbours,
+  const Eigen::MatrixXi& v_is_old,
+  const Eigen::MatrixXi& v_is_boundary,
+        Eigen::MatrixXd& vertices
+){
+  int vold_int, vnew_int;
+  Eigen::Vector3d vold;
+  Eigen::Vector3d vold_prime;
+    std::vector<int> vold_neighbours;
+    std::vector<Eigen::Vector3d> vold_int_neighbours;
+
+  for(
+    std::map<int, std::vector<int>>::const_iterator it = neighbours.begin();
+    it != neighbours.end();
+    it++
+  ){
+    vold_int = it->first;
+    if(v_is_old(vold_int, 0) && !v_is_boundary(vold_int, 0))
+    {
+      vold_neighbours = it->second;
+      vold_int_neighbours.clear();
+      
+      for(
+        std::vector<int>::const_iterator n_it = vold_neighbours.begin();
+        n_it != vold_neighbours.end();
+        n_it++
+      ){
+        if(!v_is_old(*n_it, 0) && !v_is_boundary(*n_it, 0))
+        {
+          vold_int_neighbours.push_back(
+            Eigen::Vector3d(vertices.row(*n_it))
+          );
+        }
+      }
+
+      if(vold_int_neighbours.size() > 0)
+      {
+        vold = vertices.row(vold_int);
+        WT_Lifting_3(
+          vold_int_neighbours,
+          vold,
+          vold_prime
+        );
+
+        vertices.row(vold_int) = vold_prime;
+      }
+    }
+  }
+
+}
+
 void fwt_lifting5 (
 	const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
 	const std::map<int, std::vector<int>>& neighbours_coarse,

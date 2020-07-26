@@ -84,21 +84,24 @@ double scalar_delta(
 */
 
 Eigen::Vector3d WT_Lifting_3_getScalarDeltaSum(
-    const Eigen::MatrixX3d vertices
+    const std::vector<Eigen::Vector3d> vertices
 ) {
     Eigen::Vector3d sum;
     sum << 0, 0, 0;
 
-    int len = vertices.rows();
-    for(int j = 0; j < len; j++) {
-        sum += vertices.row(j);
+    for(
+        std::vector<Eigen::Vector3d>::const_iterator it = vertices.begin();
+        it != vertices.end();
+        it++
+    ){
+        sum += *it;
     }
 
-    return scalar_delta(len) * sum;
+    return scalar_delta(vertices.size()) * sum;
 }
 
 void WT_Lifting_3(
-    const Eigen::MatrixX3d vertices,
+    const std::vector<Eigen::Vector3d> vertices,
     const Eigen::Vector3d v,
     Eigen::Vector3d& v_prime
 ) {
@@ -107,7 +110,7 @@ void WT_Lifting_3(
 
 void WT_Lifting_3_inverse(
     const Eigen::Vector3d v_prime,
-    const Eigen::MatrixX3d vertices,
+    const std::vector<Eigen::Vector3d> vertices,
     Eigen::Vector3d& v
 ) {
     v = v_prime + WT_Lifting_3_getScalarDeltaSum(vertices);

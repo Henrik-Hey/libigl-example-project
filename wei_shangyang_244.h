@@ -14,6 +14,12 @@ void WT_Lifting_2(
     Eigen::Vector3d& v_prime
 );
 
+void WT_Lifting_3(
+    const std::vector<Eigen::Vector3d> vertices,
+    const Eigen::Vector3d v,
+    Eigen::Vector3d& v_prime
+);
+
 void WT_Lifting_5(
     const Eigen::Vector3d v,
     const Eigen::Vector3d v1,
