@@ -223,6 +223,13 @@ int main(int argc, char * argv[])
       neighbours_fine,
       V_copy
     );
+
+    fwt_lifting4 (
+      v_is_old,
+      v_is_boundary,
+      neighbours_fine,
+      V_copy
+    );
   
     fwt_lifting5 (
       bound_vnew_to_bound_volds,

@@ -68,6 +68,7 @@ void fwt_scaling (
 void fwt_lifting4 (
 	const Eigen::MatrixXi& v_is_old,
 	const Eigen::MatrixXi& v_is_boundary,
+  const std::map<int, std::vector<int>>& neighbours_fine,
 	Eigen::MatrixXd& V
 );
 

@@ -165,6 +165,43 @@ void fwt_scaling (
   std::cout << "Begin FWT Scaling" << std::endl;
 };
 
+void fwt_lifting4 (
+	const Eigen::MatrixXi& v_is_old,
+	const Eigen::MatrixXi& v_is_boundary,
+  const std::map<int, std::vector<int>>& neighbours_fine,
+	Eigen::MatrixXd& V
+){
+  std::cout << "Begin FWT Lifting 4" << std::endl;
+  Eigen::Vector3d v_prime;
+  int v_0, v_1, v_2, v_3;
+  for(int v=0; v<V.rows(); v++)
+  {
+    if(v_is_old(v,0)==0&&v_is_boundary(v,0)==0)
+    {
+      get_fig216f_map_with_a_splash_of_henrik(
+        v,
+        neighbours_fine,
+        v_is_old,
+        v_0,
+        v_1,
+        v_2,
+        v_3
+      );
+
+      WT_Lifting_4(
+        Eigen::Vector3d(V.row(v)),
+        Eigen::Vector3d(V.row(v_0)),
+        Eigen::Vector3d(V.row(v_1)),
+        Eigen::Vector3d(V.row(v_2)),
+        Eigen::Vector3d(V.row(v_3)),
+        v_prime
+      );
+      V.row(v) = v_prime;
+    }
+  }
+  std::cout << "Completed FWT Lifting 4" << std::endl;
+};
+
 void fwt_lifting5 (
 	const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
 	const std::map<int, std::vector<int>>& neighbours_coarse,
