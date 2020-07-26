@@ -219,6 +219,13 @@ int main(int argc, char * argv[])
       bound_vnew_to_bound_volds,
 	    V_copy 
     );
+
+    fwt_scaling(
+      v_is_old,
+      v_is_boundary,
+      neighbours_fine,
+      V_copy
+    );
   
     fwt_lifting5 (
       bound_vnew_to_bound_volds,

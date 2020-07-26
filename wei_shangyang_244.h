@@ -20,6 +20,12 @@ void WT_Lifting_3(
     Eigen::Vector3d& v_prime
 );
 
+void WT_Scaling(
+    const Eigen::Vector3d v,
+    const double n,
+    Eigen::Vector3d& v_prime 
+);
+
 void WT_Lifting_5(
     const Eigen::Vector3d v,
     const Eigen::Vector3d v1,

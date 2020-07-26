@@ -143,6 +143,29 @@ void fwt_lifting3 (
 
 }
 
+void fwt_scaling (
+	const Eigen::MatrixXi& v_is_old,
+	const Eigen::MatrixXi& v_is_boundary,
+  const std::map<int, std::vector<int>>& neighbours_fine,
+	Eigen::MatrixXd& V
+){
+  std::cout << "Begin FWT Scaling" << std::endl;
+  Eigen::Vector3d v_prime;
+  for(int v=0; v<V.rows(); v++)
+  {
+    if(v_is_old(v,0)==1&&v_is_boundary(v,0)==0)
+    {
+      WT_Scaling(
+        Eigen::Vector3d(V.row(v)),
+        neighbours_fine.at(v).size(),
+        v_prime 
+      );
+      V.row(v) = v_prime;
+    }
+  }
+  std::cout << "Begin FWT Scaling" << std::endl;
+};
+
 void fwt_lifting5 (
 	const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
 	const std::map<int, std::vector<int>>& neighbours_coarse,
