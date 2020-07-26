@@ -255,7 +255,8 @@ void get_fig216f_map_with_a_splash_of_henrik(
 					if(n_size == 1) {
 						if(!found_v_2)
 						{
-							v_2_id = *n_it; 
+							v_2_id = *n_it;
+							found_v_2 = true; 
 							break;
 						}
 						else 
