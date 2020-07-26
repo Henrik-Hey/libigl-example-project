@@ -66,9 +66,14 @@ void map_bound_vnew_to_bound_vold(
 
 void get_fig216f_map(
 	const Eigen::MatrixXi& v_is_old,
-	const std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+	const Eigen::MatrixXi& v_is_boundary,
 	const std::map<int, std::vector<int>>& neighbours_fine,
 	std::map<int, std::vector<int>>& fig_216f_map
+);
+
+void get_neighbours(
+	const std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
+	std::map<int, std::vector<int>>& neighbouring_vertices
 );
 
 //Sort an array of three entries

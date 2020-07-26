@@ -159,7 +159,7 @@ int main(int argc, char * argv[])
 
     // Lifting 5
     std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
-    std::map<int, std::vector<int>> neighbours_fine;
+    std::map<int, std::vector<int>> neighbours_fine_boundary;
     std::vector<int> boundary_vids_fine;
     edge_incident_faces(
       F,
@@ -167,12 +167,19 @@ int main(int argc, char * argv[])
     );
     get_boundary_vertices(
       edgemap_fine, 
-      boundary_vids_fine, 
-      neighbours_fine
+      boundary_vids_fine,
+      neighbours_fine_boundary
     );
     // Assert we have a consistent number of boundary vert ids in vnew
     assert(boundary_vids_fine.size() - boundary_vids_coarse.size() 
             == bound_vnew_to_bound_volds.size());
+
+    // Lifting 6 
+    std::map<int, std::vector<int>> neighbours_fine;
+    get_neighbours(
+      edgemap_fine,
+      neighbours_fine
+    );
 
     Eigen::MatrixXi v_is_boundary = Eigen::MatrixXi::Zero(V.rows(),1);
     for(
@@ -188,7 +195,7 @@ int main(int argc, char * argv[])
     std::map<int, std::vector<int>> fig_216f_map;
     get_fig216f_map(
       v_is_old,
-      edgemap_fine,
+      v_is_boundary,
       neighbours_fine,
       fig_216f_map
     );
