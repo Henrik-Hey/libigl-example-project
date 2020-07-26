@@ -243,26 +243,23 @@ void get_fig216f_map_with_a_splash_of_henrik(
 		if(*n_it != v_1_id && v_is_old(*n_it, 0))
 		{
 			v23_relevant_neighbours = neighbours.find(*n_it)->second;
-			for(
-				std::vector<int>::iterator v_23_it = v23_relevant_neighbours.begin();
-				v_23_it != v23_relevant_neighbours.end();
-				v_23_it++
+			if (
+				std::find(
+					v23_relevant_neighbours.begin(), 
+					v23_relevant_neighbours.end(),
+					v_1_id
+				) != v23_relevant_neighbours.end()
 			){
-				if(v_1_id == *v_23_it) 
-				{
 					if(!found_v_2)
 					{
 						v_2_id = *n_it;
 						found_v_2 = true; 
-						break;
 					}
 					else 
 					{
 						v_3_id = *n_it; 
-						break;
 					}
-				}
-			}	
+			}
 		}
 		if(v_2_id != NULL && v_3_id != NULL)
 		{
