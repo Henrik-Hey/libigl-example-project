@@ -44,8 +44,6 @@ void fwt_lifting1 (
       edgemap_coarse
     );
 
-    // std::cout <<  "vnew1: " << v1 << std::endl;
-    // std::cout <<  "vnew2: " << v2 << std::endl;
     WT_Lifting_1(
       Eigen::Vector3d(V.row(vold)),
       Eigen::Vector3d(V.row(v1new)),
@@ -115,9 +113,11 @@ void fwt_lifting5 (
     vold3 = it->second[1];
     // Find coarse neighbours of vold 2 and vold 3
     assert(neighbours_coarse.at(vold2).size()==2);
-    vold1 = neighbours_coarse.at(vold2)[0]==vold3 ? neighbours_coarse.at(vold2)[1] : neighbours_coarse.at(vold2)[0];
+    vold1 = neighbours_coarse.at(vold2)[0]==vold3 ? 
+            neighbours_coarse.at(vold2)[1] : neighbours_coarse.at(vold2)[0];
     assert(neighbours_coarse.at(vold3).size()==2);
-    vold4 = neighbours_coarse.at(vold3)[0]==vold2 ? neighbours_coarse.at(vold3)[1] : neighbours_coarse.at(vold3)[0];
+    vold4 = neighbours_coarse.at(vold3)[0]==vold2 ? 
+            neighbours_coarse.at(vold3)[1] : neighbours_coarse.at(vold3)[0];
 
     WT_Lifting_5(
       Eigen::Vector3d(V.row(vnew)),
@@ -138,4 +138,11 @@ void fwt_lifting5 (
   }
 
   std::cout << "Completed FWT Lifting 5" << std::endl;
+};
+
+void fwt_lifting6 (
+	const std::map<int, std::vector<int>>& fig_216f_map,
+	Eigen::MatrixXd& V
+){
+  
 };

@@ -8,7 +8,7 @@
 bool is_quadrisection(
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXd& V_in,
-	std::vector<int>& v_old,
+	Eigen::MatrixXi& v_is_old,
 	Eigen::MatrixXi& F_coarse,
 	Eigen::MatrixXi& fids_covered_by_F_coarse
 ){
@@ -33,7 +33,7 @@ bool is_quadrisection(
 	{
 		// Try to construct a bijection from current
 		// connect component to the input mesh
-		is_equivalence( F_in, V_in, *it, tiles, covered_faces, v_old, F_coarse, fids_covered_by_F_coarse );
+		is_equivalence( F_in, V_in, *it, tiles, covered_faces, v_is_old, F_coarse, fids_covered_by_F_coarse );
 		// Stop early as soon as we find a
 		// successful candidate
 		if(F_coarse.rows()>0) 
@@ -193,7 +193,7 @@ void is_equivalence(
 	// make up each tile.
 	const Eigen::MatrixXi& tiles,
 	const Eigen::MatrixXi& covered_faces,
-	std::vector<int>& v_old,
+	Eigen::MatrixXi& v_is_old,
 	Eigen::MatrixXi& F_coarse,
 	Eigen::MatrixXi& fids_covered_by_F_coarse
 ){
@@ -210,6 +210,7 @@ void is_equivalence(
 		submesh.setIdentity(candidate.size(),3);
 		submesh_covered_faces.setIdentity(candidate.size(),4);
 		int t=0;
+		v_is_old = Eigen::MatrixXi::Zero(V_in.rows(),1);
 		for(auto it2=candidate.begin(); it2!=candidate.end(); it2++)
 		{
 			for(int i=0; i<3; i++)
@@ -224,6 +225,7 @@ void is_equivalence(
 				// the tiles which form the candidate.
 				if( std::find(V_i.begin(), V_i.end(), tiles(*it2,i)) == V_i.end() )
 				{
+					v_is_old(tiles(*it2,i),0) = 1;
 					V_i.emplace_back(tiles(*it2,i));
 				}
 			}
@@ -289,53 +291,8 @@ void is_equivalence(
 			{ 
 				std::cout << "Gagnant!" << std::endl; 
 
-				// // Create a matrix of vertex positions
-				// // with new index names
-				// Eigen::MatrixXd submesh_vertices; // "Vertex positions" from candidate
-				// submesh_vertices.setIdentity(V_i.size(), 3);
-				// int v=0;
-				// std::map<int,int> vert_translator;
-				// for(auto it2=V_i.begin(); it2!=V_i.end(); it2++)
-				// {
-				// 	for(int i=0; i<3; i++)
-				// 	{
-				// 		vert_translator[*it2] = v;
-				// 		submesh_vertices(v,i) = V_in(*it2,i);
-				// 	}
-				// 	v++;
-				// }
-
-				// // Rename the vids in submesh to point to 
-				// // vids in submesh_vertices as opposed 
-				// // to V, cause they used to have the
-				// // corners of the current candidate tile.
-				// for(int f=0; f<submesh.rows(); f++)
-				// {
-				// 	submesh(f,0) = vert_translator[submesh(f,0)];
-				// 	submesh(f,1) = vert_translator[submesh(f,1)];
-				// 	submesh(f,2) = vert_translator[submesh(f,2)];
-				// }
-
-				// Eigen::MatrixXi F_pre_subdiv = Eigen::MatrixXi(submesh);
-				// Eigen::MatrixXd V_pre_subdiv = Eigen::MatrixXd(submesh_vertices);
-
-				// // Subdivide the candidate
-				// igl::loop( Eigen::MatrixXd(
-				// 	Eigen::MatrixXd(submesh_vertices)), 
-				// 	Eigen::MatrixXi(submesh), 
-				// 	submesh_vertices, 
-				// 	submesh);
-				// assert(V_in.rows()==submesh_vertices.rows());
-				// assert(V_in.cols()==submesh_vertices.cols());
-
 				F_coarse = submesh;
-				v_old = V_i;
 				fids_covered_by_F_coarse = submesh_covered_faces;
-				// V_old = V_pre_subdiv;
-				// F_new = submesh.block(F_old.rows()-1, 0, submesh.rows()-F_old.rows(), 3);
-				// V_new = submesh_vertices.block(V_old.rows()-1, 0, submesh_vertices.rows()-V_old.rows(), 3);
-				// assert(F_new.rows()+F_old.rows() == submesh.rows());
-				// assert(V_new.rows()+V_old.rows() == submesh_vertices.rows());
 			}
 		} 
 		else

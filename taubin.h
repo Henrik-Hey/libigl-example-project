@@ -19,7 +19,7 @@
 bool is_quadrisection(
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXd& V_in,
-	std::vector<int>& v_old,
+	Eigen::MatrixXi& v_is_old,
 	Eigen::MatrixXi& F_coarse,
 	Eigen::MatrixXi& fids_covered_by_F_coarse
 );
@@ -52,7 +52,7 @@ void is_equivalence(
 	const std::vector<int>& candidate,
 	const Eigen::MatrixXi& tiles,
 	const Eigen::MatrixXi& covered_faces,
-	std::vector<int>& v_old,
+	Eigen::MatrixXi& v_is_old,
 	Eigen::MatrixXi& F_coarse,
 	Eigen::MatrixXi& fids_covered_by_F_coarse
 );

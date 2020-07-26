@@ -75,3 +75,7 @@ void fwt_lifting5 (
  * 				Use valence to compute alpha, beta, gamma, delta, and omega
  * 				Update the position of the enclosing vertex given the equation
 */
+void fwt_lifting6 (
+	const std::map<int, std::vector<int>>& fig_216f_map,
+	Eigen::MatrixXd& V
+);

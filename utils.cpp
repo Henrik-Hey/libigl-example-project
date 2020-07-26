@@ -148,6 +148,63 @@ void map_bound_vnew_to_bound_vold(
   }
 };
 
+void get_fig216f_map(
+	const Eigen::MatrixXi& v_is_old,
+	const std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	std::map<int, std::vector<int>>& fig_216f_map
+){
+
+	int edge_v1, edge_v2;
+	for(
+    std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap_fine.begin();
+    it != edgemap_fine.end();
+    it++
+  ){
+		if(it->second.size()==2)
+		{
+			// Apply to both verts that form the 
+			// current regular edge.
+			// First in pair
+			edge_v1 = v_is_old(it->first.first,0);
+			edge_v2 = v_is_old(it->first.second,0);
+			if(v_is_old(edge_v1,0)==0)
+			{
+				// Iterate over its neighbours and 
+				// store the ones that are in Vold
+				for(
+					std::vector<int>::const_iterator it_n = neighbours_fine.at(edge_v1).begin();
+					it_n != neighbours_fine.at(edge_v1).end();
+					it_n++
+				){
+					if(v_is_old(*it_n,0)==1)
+					{
+						fig_216f_map[edge_v1].emplace_back(*it_n);
+					}
+				}
+				assert(fig_216f_map[edge_v1].size()==4);
+			}
+			// Do the same thing for the other vert in the curr reg edge
+			if(v_is_old(edge_v2,0)==0)
+			{
+				// Iterate over its neighbours and 
+				// store the ones that are in Vold
+				for(
+					std::vector<int>::const_iterator it_n = neighbours_fine.at(edge_v2).begin();
+					it_n != neighbours_fine.at(edge_v2).end();
+					it_n++
+				){
+					if(v_is_old(*it_n,0)==1)
+					{
+						fig_216f_map[edge_v2].emplace_back(*it_n);
+					}
+				}
+				assert(fig_216f_map[edge_v2].size()==4);
+			}
+		}
+  }
+};
+
 void sort3(int arr[]) 
 { 
 	// Insert arr[1] 

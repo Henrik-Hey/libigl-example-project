@@ -62,5 +62,12 @@ void get_vnew_boundary_vertices(
 	std::map<int, std::vector<int>>& neighbouring_vertices_vnew 
 );
 
+void get_fig216f_map(
+	const Eigen::MatrixXi& v_is_old,
+	const std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	std::map<int, std::vector<int>>& fig_216f_map
+);
+
 //Sort an array of three entries
 void sort3(int arr[]);
