@@ -174,6 +174,16 @@ int main(int argc, char * argv[])
     assert(boundary_vids_fine.size() - boundary_vids_coarse.size() 
             == bound_vnew_to_bound_volds.size());
 
+    Eigen::MatrixXi v_is_boundary = Eigen::MatrixXi::Zero(V.rows(),1);
+    for(
+      std::vector<int>::iterator it = boundary_vids_fine.begin();
+      it != boundary_vids_fine.end();
+      it++
+    )
+    {
+      v_is_boundary(*it,0) = 1;
+    }
+
     // Lifting 6
     std::map<int, std::vector<int>> fig_216f_map;
     get_fig216f_map(
