@@ -55,5 +55,12 @@ void map_bound_vnew_to_bound_vold(
 	std::map<int, std::vector<int>>& bound_vnew_to_bound_volds
 );
 
+void get_vnew_boundary_vertices(
+	const Eigen::MatrixXi& F,
+	std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+	std::vector<int>& boundary_vertices_vnew, 
+	std::map<int, std::vector<int>>& neighbouring_vertices_vnew 
+);
+
 //Sort an array of three entries
 void sort3(int arr[]);

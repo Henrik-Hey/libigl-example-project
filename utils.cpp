@@ -145,7 +145,6 @@ void map_bound_vnew_to_bound_vold(
 
 		bound_vnew_to_bound_volds[v1new].emplace_back(vold);
 		bound_vnew_to_bound_volds[v2new].emplace_back(vold);
-
   }
 };
 

@@ -94,11 +94,48 @@ void fwt_lifting2 (
 };
 
 void fwt_lifting5 (
-	const Eigen::MatrixXi& F_fine,
-	const Eigen::MatrixXi& F_coarse,
-	const std::vector<int>& v_old,
-	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
+	const std::map<int, std::vector<int>>& neighbours_coarse,
 	Eigen::MatrixXd& V
 ){
-  
+  std::cout << "Begin FWT Lifting 5" << std::endl;
+
+  int vold1, vold2, vold3, vold4, vnew;
+  Eigen::Vector3d vold1_prime, vold2_prime, vold3_prime, vold4_prime;
+  for(
+    std::map<int, std::vector<int>>::const_iterator it = bound_vnew_to_bound_volds.begin();
+    it != bound_vnew_to_bound_volds.end();
+    it++
+  ){
+    assert(it->second.size()==2);
+    
+    vnew = it->first;
+    // Following diagram in Fig2.16e
+    vold2 = it->second[0];
+    vold3 = it->second[1];
+    // Find coarse neighbours of vold 2 and vold 3
+    assert(neighbours_coarse.at(vold2).size()==2);
+    vold1 = neighbours_coarse.at(vold2)[0]==vold3 ? neighbours_coarse.at(vold2)[1] : neighbours_coarse.at(vold2)[0];
+    assert(neighbours_coarse.at(vold3).size()==2);
+    vold4 = neighbours_coarse.at(vold3)[0]==vold2 ? neighbours_coarse.at(vold3)[1] : neighbours_coarse.at(vold3)[0];
+
+    WT_Lifting_5(
+      Eigen::Vector3d(V.row(vnew)),
+      Eigen::Vector3d(V.row(vold1)),
+      Eigen::Vector3d(V.row(vold2)),
+      Eigen::Vector3d(V.row(vold3)),
+      Eigen::Vector3d(V.row(vold4)),
+      vold1_prime,
+      vold2_prime,
+      vold3_prime,
+      vold4_prime
+    );
+
+    V.row(vold1) = vold1_prime;
+    V.row(vold2) = vold2_prime;
+    V.row(vold3) = vold3_prime;
+    V.row(vold4) = vold4_prime;
+  }
+
+  std::cout << "Completed FWT Lifting 5" << std::endl;
 };

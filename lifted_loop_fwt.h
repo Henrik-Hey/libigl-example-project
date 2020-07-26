@@ -61,10 +61,8 @@ void fwt_lifting2 (
  * 		Update the values of those 4 vertices by the given equation
 */
 void fwt_lifting5 (
-	const Eigen::MatrixXi& F_fine,
-	const Eigen::MatrixXi& F_coarse,
-	const std::vector<int>& v_old,
-	const Eigen::MatrixXi& fids_covered_by_F_coarse,
+	const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
+	const std::map<int, std::vector<int>>& neighbours_coarse,
 	Eigen::MatrixXd& V
 );
 

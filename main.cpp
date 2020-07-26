@@ -125,6 +125,7 @@ int main(int argc, char * argv[])
     // viewer.data().set_face_based(true);
     // viewer.launch();
 
+    // Lifting 1
     // Generate all the edge and neighbour information in F_coarse.
     // Note that all the vids will be referencing V_copy
     std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
@@ -133,7 +134,6 @@ int main(int argc, char * argv[])
       F_coarse,
       edgemap_coarse
     );
-
     // Figure out which Vold vids are boundary verts
     std::vector<int> boundary_vids_coarse;
     get_boundary_vertices(
@@ -142,18 +142,7 @@ int main(int argc, char * argv[])
       neighbours_coarse
     );
 
-    Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
-
-    // Call Lifting 1
-    fwt_lifting1(
-      F,
-      fids_covered_by_F_coarse,
-      edgemap_coarse,
-      neighbours_coarse,
-      boundary_vids_coarse,
-      V_copy
-    );
-
+    // Lifting 2
     // Generate a map from Vnew boundary verts
     // to its neighbouring boundary verts in Vold
     std::map<int, std::vector<int>> bound_vnew_to_bound_volds;
@@ -166,9 +155,44 @@ int main(int argc, char * argv[])
       bound_vnew_to_bound_volds
     );
 
+    // Lifting 5
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
+    std::map<int, std::vector<int>> neighbours_fine;
+    std::vector<int> boundary_vids_fine;
+    edge_incident_faces(
+      F,
+      edgemap_fine
+    );
+    get_boundary_vertices(
+      edgemap_fine, 
+      boundary_vids_fine, 
+      neighbours_fine
+    );
+    // Assert we have a consistent number of boundary vert ids in vnew
+    assert(boundary_vids_fine.size() - boundary_vids_coarse.size() == bound_vnew_to_bound_volds.size());
+
+    // Make copy of V positions to mutate
+    Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
+
+    // Call Lifting 1
+    fwt_lifting1(
+      F,
+      fids_covered_by_F_coarse,
+      edgemap_coarse,
+      neighbours_coarse,
+      boundary_vids_coarse,
+      V_copy
+    );
+
     fwt_lifting2(
       bound_vnew_to_bound_volds,
 	    V_copy 
+    );
+  
+    fwt_lifting5 (
+      bound_vnew_to_bound_volds,
+      neighbours_coarse,
+      V_copy
     );
 
     // Visualize the output of the lifting schemes
