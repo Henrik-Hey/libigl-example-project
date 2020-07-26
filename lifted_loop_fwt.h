@@ -52,6 +52,12 @@ void fwt_lifting3 (
  * 		Update the position of the vertex by scaling it by the given scalar
  * 			which is a function of the scalar
 */
+void fwt_scaling (
+	const Eigen::MatrixXi& v_is_old,
+	const Eigen::MatrixXi& v_is_boundary,
+  const std::map<int, std::vector<int>>& neighbours_fine,
+	Eigen::MatrixXd& V
+);
 
 /**                 
  * Lifting IV
