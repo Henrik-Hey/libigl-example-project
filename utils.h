@@ -71,6 +71,16 @@ void get_fig216f_map(
 	std::map<int, std::vector<int>>& fig_216f_map
 );
 
+void get_fig216f_map_with_a_splash_of_henrik(
+	const int v_new_id,
+	const std::map<int, std::vector<int>>& neighbours,
+  const Eigen::MatrixXi& v_is_old,
+	  		int& v_0,
+	  		int& v_1,
+	  		int& v_2,
+	  		int& v_3
+);
+
 void get_neighbours(
 	const std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
 	std::map<int, std::vector<int>>& neighbouring_vertices

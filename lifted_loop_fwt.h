@@ -65,6 +65,11 @@ void fwt_scaling (
  * 		Grab the 4 vertices in Vold which enclose the interior vertex of Vnew
  * 		Update the position of the interior vertex in Vnew by the given equation
 */
+void fwt_lifting4 (
+	const Eigen::MatrixXi& v_is_old,
+	const Eigen::MatrixXi& v_is_boundary,
+	Eigen::MatrixXd& V
+);
 
 /**                 
  * Lifting V
@@ -88,7 +93,8 @@ void fwt_lifting5 (
  * 				Update the position of the enclosing vertex given the equation
 */
 void fwt_lifting6 (
-	const std::map<int, std::vector<int>>& fig_216f_map,
+	const Eigen::MatrixXi& v_is_old,
+	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
 	Eigen::MatrixXd& V
 );

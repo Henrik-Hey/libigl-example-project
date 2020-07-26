@@ -196,12 +196,11 @@ void get_fig216f_map(
 void get_fig216f_map_with_a_splash_of_henrik(
 	const int v_new_id,
 	const std::map<int, std::vector<int>>& neighbours,
-  const Eigen::MatrixXd& vertices,
   const Eigen::MatrixXi& v_is_old,
-	  		Eigen::Vector3d& v_0,
-	  		Eigen::Vector3d& v_1,
-	  		Eigen::Vector3d& v_2,
-	  		Eigen::Vector3d& v_3
+	  		int& v_0,
+	  		int& v_1,
+	  		int& v_2,
+	  		int& v_3
 ){
 	bool found_v_0 = false;
 	bool found_v_2 = false;
@@ -269,10 +268,10 @@ void get_fig216f_map_with_a_splash_of_henrik(
 
 	assert(v_2_id != NULL && v_3_id != NULL);
 
-	v_0 = vertices.row(v_0_id);
-	v_1 = vertices.row(v_1_id);
-	v_2 = vertices.row(v_2_id);
-	v_3 = vertices.row(v_3_id);
+	v_0 = v_0_id;
+	v_1 = v_1_id;
+	v_2 = v_2_id;
+	v_3 = v_3_id;
 }
 
 void sort3(int arr[]) 

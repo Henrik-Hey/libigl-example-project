@@ -180,7 +180,6 @@ int main(int argc, char * argv[])
       edgemap_fine,
       neighbours_fine
     );
-
     Eigen::MatrixXi v_is_boundary = Eigen::MatrixXi::Zero(V.rows(),1);
     for(
       std::vector<int>::iterator it = boundary_vids_fine.begin();
@@ -190,15 +189,6 @@ int main(int argc, char * argv[])
     {
       v_is_boundary(*it,0) = 1;
     }
-
-    // Lifting 6
-    std::map<int, std::vector<int>> fig_216f_map;
-    get_fig216f_map(
-      v_is_old,
-      v_is_boundary,
-      neighbours_fine,
-      fig_216f_map
-    );
 
     // BEGIN FWT
 
@@ -234,7 +224,8 @@ int main(int argc, char * argv[])
     );
 
     fwt_lifting6 (
-      fig_216f_map,
+      v_is_old,
+      v_is_boundary,
       neighbours_fine,
       V_copy
     );
@@ -249,5 +240,4 @@ int main(int argc, char * argv[])
 
   }
   // Henrik takes nice photos
-
 }

@@ -215,54 +215,76 @@ void fwt_lifting5 (
 };
 
 void fwt_lifting6 (
-	const std::map<int, std::vector<int>>& fig_216f_map,
+	const Eigen::MatrixXi& v_is_old,
+	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
 	Eigen::MatrixXd& V
 ){
   std::cout << "Begin FWT Lifting 6" << std::endl;
 
-
-  std::vector<double> valence;
-  for(
-    std::map<int, std::vector<int>>::const_iterator it = fig_216f_map.begin();
-    it != fig_216f_map.end();
-    it++
-  ){
-
-    valence.clear();
-    Eigen::Vector3d v_i_prime;
-
-    // Iterate over the vold neighbours of current interior vnew
-    for(
-      std::vector<int>::const_iterator it_n = it->second.begin();
-      it_n != it->second.end();
-      it_n++
-    ){
-      valence.emplace_back(neighbours_fine.at(*it_n).size());
-    }
-    assert(valence.size()==4);
-
-    Eigen::Vector4d W;
-    WT_Solve_Weights(
-      valence.at(0),
-      valence.at(1),
-      valence.at(2),
-      valence.at(3),
-      W
-    );
-
-    for(int n=0; n<it->second.size(); n++)
+  Eigen::Vector3d v_i_prime;
+  int v_0, v_1, v_2, v_3;
+  for(int v=0; v<V.rows(); v++)
+  {
+    if(v_is_old(v,0)==0&&v_is_boundary(v,0)==0)
     {
-      WT_Lifting_6(
-        Eigen::Vector3d(V.row(it->second.at(n))), // vold
-        W(n),
-        Eigen::Vector3d (V.row(it->first)), // vnew
-        v_i_prime
+      get_fig216f_map_with_a_splash_of_henrik(
+        v,
+        neighbours_fine,
+        v_is_old,
+        v_0,
+        v_1,
+        v_2,
+        v_3
       );
 
-      V.row(it->second.at(n)) = v_i_prime;
-    }
+      std::cout <<  v_0 << std::endl;
+      std::cout <<  v_1 << std::endl;
+      std::cout <<  v_2 << std::endl;
+      std::cout <<  v_3 << std::endl;
 
+      Eigen::Vector4d W;
+      WT_Solve_Weights(
+        neighbours_fine.at(v_0).size(),
+        neighbours_fine.at(v_1).size(),
+        neighbours_fine.at(v_2).size(),
+        neighbours_fine.at(v_3).size(),
+        W
+      );
+
+      WT_Lifting_6(
+        Eigen::Vector3d(V.row(v_0)), // vold
+        W(0),
+        Eigen::Vector3d (V.row(v)), // vnew
+        v_i_prime
+      );
+      V.row(v_0) = v_i_prime;
+
+      WT_Lifting_6(
+        Eigen::Vector3d(V.row(v_1)), // vold
+        W(1),
+        Eigen::Vector3d (V.row(v)), // vnew
+        v_i_prime
+      );
+      V.row(v_1) = v_i_prime;
+
+      WT_Lifting_6(
+        Eigen::Vector3d(V.row(v_2)), // vold
+        W(2),
+        Eigen::Vector3d (V.row(v)), // vnew
+        v_i_prime
+      );
+      V.row(v_2) = v_i_prime;
+
+      WT_Lifting_6(
+        Eigen::Vector3d(V.row(v_3)), // vold
+        W(3),
+        Eigen::Vector3d (V.row(v)), // vnew
+        v_i_prime
+      );
+      V.row(v_3) = v_i_prime;
+    }
   }
+
   std::cout << "Completed FWT Lifting 6" << std::endl;
 };
