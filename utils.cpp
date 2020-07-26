@@ -205,7 +205,6 @@ void get_fig216f_map_with_a_splash_of_henrik(
 ){
 	bool found_v_0 = false;
 	bool found_v_2 = false;
-	int n_size = 0;
 	int v_0_id, 
 			v_1_id, 
 			v_2_id, 
@@ -250,22 +249,19 @@ void get_fig216f_map_with_a_splash_of_henrik(
 				v_23_it != v23_relevant_neighbours.end();
 				v_23_it++
 			){
-				if(v_0_id == *v_23_it || v_1_id == *v_23_it) 
+				if(v_1_id == *v_23_it) 
 				{
-					if(n_size == 1) {
-						if(!found_v_2)
-						{
-							v_2_id = *n_it;
-							found_v_2 = true; 
-							break;
-						}
-						else 
-						{
-							v_3_id = *n_it; 
-							break;
-						}
+					if(!found_v_2)
+					{
+						v_2_id = *n_it;
+						found_v_2 = true; 
+						break;
 					}
-					n_size++;
+					else 
+					{
+						v_3_id = *n_it; 
+						break;
+					}
 				}
 			}	
 		}
