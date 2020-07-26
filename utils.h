@@ -21,11 +21,20 @@ void edge_incident_faces(
  * returns a vector of all the vids which formed a 
  * boundary edge (ie boundary vertices) as well as 
  * a map from the boundary vid to a list of its neighbours.
+ * 
+ * Inputs:
+ * 	incident_faces: Map from pair of vids forming edge to list 
+ * 									of fids that are incident to it
+ * Outputs:
+ * 	boundary_vertices: List of vids used in incident faces 
+ * 										 that are boundary vertices
+ * 	neighbouring_vertices: Map from boundary vid to list of 
+ * 												 vids in its neighbourhood
 */
 void get_boundary_vertices(
-	std::map<std::pair<int,int>, std::vector<int>>& incident_faces, // map from pair of vids forming edge to list of fids that are incident to it
-	std::vector<int>& boundary_vertices, // List of vids used in incident faces that are boundary vertices
-	std::map<int, std::vector<int>>& neighbouring_vertices // Map from boundary vid to list of vids in its neighbourhood
+	const std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
+	std::vector<int>& boundary_vertices,
+	std::map<int, std::vector<int>>& neighbouring_vertices
 );
 
 /**
@@ -53,13 +62,6 @@ void map_bound_vnew_to_bound_vold(
   const std::map<int, std::vector<int>>& neighbours_coarse,
   const std::vector<int>& boundary_vids_coarse,
 	std::map<int, std::vector<int>>& bound_vnew_to_bound_volds
-);
-
-void get_vnew_boundary_vertices(
-	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
-	std::vector<int>& boundary_vertices_vnew, 
-	std::map<int, std::vector<int>>& neighbouring_vertices_vnew 
 );
 
 void get_fig216f_map(

@@ -109,7 +109,7 @@ int main(int argc, char * argv[])
 
   // HELPER FUNCTIONS FOR FWT
 
-  Eigen::MatrixXi v_is_old; // Map vid to 1 if in Vnew, and 0 if Vold
+  Eigen::MatrixXi v_is_old; // Map vid to 1 if in Vold, and 0 if Vnew
   Eigen::MatrixXi F_coarse; // Matrix whos e rows are vids in V_in that make up the coarse mesh
   Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
   if(is_quadrisection(

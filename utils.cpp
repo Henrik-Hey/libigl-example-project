@@ -20,11 +20,11 @@ void edge_incident_faces(
 };
 
 void get_boundary_vertices(
-	std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
+	const std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
 	std::vector<int>& boundary_vertices,
 	std::map<int, std::vector<int>>& neighbouring_vertices
 ){
-	std::map<std::pair<int,int>, std::vector<int>>::iterator it = incident_faces.begin();
+	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = incident_faces.begin();
 	while (it != incident_faces.end())
 	{
     if(it->second.size()==1)
