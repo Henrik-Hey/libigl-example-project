@@ -107,6 +107,8 @@ int main(int argc, char * argv[])
   igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
+  // HELPER FUNCTIONS FOR FWT
+
   Eigen::MatrixXi v_is_old; // Map vid to 1 if in Vnew, and 0 if Vold
   Eigen::MatrixXi F_coarse; // Matrix whos e rows are vids in V_in that make up the coarse mesh
   Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
@@ -169,7 +171,8 @@ int main(int argc, char * argv[])
       neighbours_fine
     );
     // Assert we have a consistent number of boundary vert ids in vnew
-    assert(boundary_vids_fine.size() - boundary_vids_coarse.size() == bound_vnew_to_bound_volds.size());
+    assert(boundary_vids_fine.size() - boundary_vids_coarse.size() 
+            == bound_vnew_to_bound_volds.size());
 
     // Lifting 6
     std::map<int, std::vector<int>> fig_216f_map;
@@ -179,6 +182,8 @@ int main(int argc, char * argv[])
       neighbours_fine,
       fig_216f_map
     );
+
+    // BEGIN FWT
 
     // Make copy of V positions to mutate
     Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
@@ -204,13 +209,19 @@ int main(int argc, char * argv[])
       V_copy
     );
 
-    
+    fwt_lifting6 (
+      fig_216f_map,
+      neighbours_fine,
+      V_copy
+    );
+
+    // END FWT
 
     // Visualize the output of the lifting schemes
-    // viewer.data().clear();
-    // viewer.data().set_mesh(V_copy,F);
-    // viewer.data().set_face_based(true);
-    // viewer.launch();
+    viewer.data().clear();
+    viewer.data().set_mesh(V_copy,F);
+    viewer.data().set_face_based(true);
+    viewer.launch();
 
   }
   // Henrik takes nice photos

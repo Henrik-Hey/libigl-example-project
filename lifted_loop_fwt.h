@@ -77,5 +77,6 @@ void fwt_lifting5 (
 */
 void fwt_lifting6 (
 	const std::map<int, std::vector<int>>& fig_216f_map,
+  const std::map<int, std::vector<int>>& neighbours_fine,
 	Eigen::MatrixXd& V
 );

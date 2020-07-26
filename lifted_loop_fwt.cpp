@@ -142,7 +142,53 @@ void fwt_lifting5 (
 
 void fwt_lifting6 (
 	const std::map<int, std::vector<int>>& fig_216f_map,
+  const std::map<int, std::vector<int>>& neighbours_fine,
 	Eigen::MatrixXd& V
 ){
-  
+  std::cout << "Begin FWT Lifting 6" << std::endl;
+
+
+  std::vector<double> valence;
+  for(
+    std::map<int, std::vector<int>>::const_iterator it = fig_216f_map.begin();
+    it != fig_216f_map.end();
+    it++
+  ){
+
+    valence.clear();
+    Eigen::Vector3d v_i_prime;
+
+    // Iterate over the vold neighbours of current interior vnew
+    for(
+      std::vector<int>::const_iterator it_n = it->second.begin();
+      it_n != it->second.end();
+      it_n++
+    ){
+      valence.emplace_back(neighbours_fine.at(*it_n).size());
+    }
+    assert(valence.size()==4);
+
+    Eigen::Vector4d W;
+    WT_Solve_Weights(
+      valence.at(0),
+      valence.at(1),
+      valence.at(2),
+      valence.at(3),
+      W
+    );
+
+    for(int n=0; n<it->second.size(); n++)
+    {
+      WT_Lifting_6(
+        Eigen::Vector3d(V.row(it->second.at(n))), // vold
+        W(n),
+        Eigen::Vector3d (V.row(it->first)), // vnew
+        v_i_prime
+      );
+
+      V.row(it->second.at(n)) = v_i_prime;
+    }
+
+  }
+  std::cout << "Completed FWT Lifting 6" << std::endl;
 };

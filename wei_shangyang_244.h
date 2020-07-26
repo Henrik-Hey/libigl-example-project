@@ -25,3 +25,18 @@ void WT_Lifting_5(
     Eigen::Vector3d& v3_prime,
     Eigen::Vector3d& v4_prime
 );
+
+void WT_Solve_Weights(
+    const double n_0,
+    const double n_1,
+    const double n_2,
+    const double n_3,
+    Eigen::Vector4d& W
+);
+
+void WT_Lifting_6(
+    const Eigen::Vector3d v_i,
+    const double omega_i,
+    const Eigen::Vector3d v,
+    Eigen::Vector3d& v_i_prime
+);
