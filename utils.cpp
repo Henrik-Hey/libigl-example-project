@@ -204,10 +204,10 @@ void get_fig216f_map_with_a_splash_of_henrik(
 ){
 	bool found_v_0 = false;
 	bool found_v_2 = false;
-	int v_0_id, 
-			v_1_id, 
-			v_2_id, 
-			v_3_id;
+	int v_0_id = NULL, 
+			v_1_id = NULL, 
+			v_2_id = NULL, 
+			v_3_id = NULL;
 
 	std::vector<int> vnew_relevant_neighbours = neighbours.find(v_new_id)->second;
 	for(

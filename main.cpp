@@ -210,6 +210,13 @@ int main(int argc, char * argv[])
 	    V_copy 
     );
 
+    fwt_lifting3(
+      neighbours_fine,
+      v_is_old,
+      v_is_boundary,
+      V_copy
+    );
+
     fwt_scaling(
       v_is_old,
       v_is_boundary,
