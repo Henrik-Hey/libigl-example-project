@@ -255,141 +255,142 @@ void WT_Get_A(
 ) {
     // Coefficients
 
-    const double alpha_1 = WT_Coefficient_Alpha(1);
-    const double alpha_2 = WT_Coefficient_Alpha(2);
-    const double alpha_3 = WT_Coefficient_Alpha(3);
-    const double alpha_4 = WT_Coefficient_Alpha(4);
+    const double alpha_0 = WT_Coefficient_Alpha(n_0);
+    const double alpha_1 = WT_Coefficient_Alpha(n_1);
+    const double alpha_2 = WT_Coefficient_Alpha(n_2);
+    const double alpha_3 = WT_Coefficient_Alpha(n_3);
 
-    const double gamma_0 = WT_Coefficient_Gamma(0);
-    const double gamma_1 = WT_Coefficient_Gamma(1);
-    const double gamma_2 = WT_Coefficient_Gamma(2);
-    const double gamma_3 = WT_Coefficient_Gamma(3);
-    const double gamma_4 = WT_Coefficient_Gamma(4);
+    const double gamma_0 = WT_Coefficient_Gamma(n_0);
+    const double gamma_1 = WT_Coefficient_Gamma(n_1);
+    const double gamma_2 = WT_Coefficient_Gamma(n_2);
+    const double gamma_3 = WT_Coefficient_Gamma(n_3);
 
     /** START OF VARIABLE INITIALIZATION **/
 
     /** 
      * IDENTITY BOYOS
     */
+    double a_00 = 0;
     double a_11 = 0;
     double a_22 = 0;
     double a_33 = 0;
-    double a_44 = 0;
 
     /** 
      * Mirror-able
-     * These values can be mirrored. i.e. a_12 == a_21, a_13 == a_31, etc...
+     * These values can be mirrored. i.e. a_01 == a_21, a_02 == a_31, etc...
     */
+    double a_01 = 0;
+    double a_02 = 0;
+    double a_03 = 0;
     double a_12 = 0;
     double a_13 = 0;
-    double a_14 = 0;
     double a_23 = 0;
-    double a_24 = 0;
-    double a_34 = 0;
 
     /** END OF VARIABLE INITIALIZATION **/
 
     // Hair-loss-math-time (its not hard just exhaustive)
     // first start with the IDENTITY BOYOS
 
+    a_00 += std::pow(alpha_0, 2);
+    a_00 += std::pow(gamma_1, 2);
+    a_00 += std::pow(gamma_2, 2);
+    a_00 += std::pow(gamma_3, 2);
+    a_00 += (1 / 256) * (n_0 - 3);
+    a_00 += (5 / 32) * n_0;
+
+    a_11 += std::pow(gamma_0, 2);
     a_11 += std::pow(alpha_1, 2);
     a_11 += std::pow(gamma_2, 2);
     a_11 += std::pow(gamma_3, 2);
-    a_11 += std::pow(gamma_4, 2);
-    a_11 += (1 / 256) * (n_0 - 3);
-    a_11 += (5 / 32) * n_0;
+    a_11 += (1 / 256) * (n_1 - 3);
+    a_11 += (5 / 32) * n_1;
 
+    a_22 += std::pow(gamma_0, 2);
     a_22 += std::pow(gamma_1, 2);
     a_22 += std::pow(alpha_2, 2);
-    a_22 += std::pow(gamma_3, 2);
-    a_22 += std::pow(gamma_4, 2);
-    a_22 += (1 / 256) * (n_1 - 3);
-    a_22 += (5 / 32) * n_1;
+    a_22 += (1 / 256) * (n_2 - 3);
+    a_22 += (5 / 32) * n_2;
 
     a_33 += std::pow(gamma_0, 2);
     a_33 += std::pow(gamma_1, 2);
-    a_33 += std::pow(alpha_2, 2);
-    a_33 += (1 / 256) * (n_2 - 3);
-    a_33 += (5 / 32) * n_2;
-
-    a_44 += std::pow(gamma_0, 2);
-    a_44 += std::pow(gamma_1, 2);
-    a_44 += std::pow(alpha_3, 2);
-    a_44 += (1 / 256) * (n_3 - 3);
-    a_44 += (5 / 32) * n_3;
+    a_33 += std::pow(alpha_3, 2);
+    a_33 += (1 / 256) * (n_3 - 3);
+    a_33 += (5 / 32) * n_3;
 
     // lastly the mirror bois
 
-    a_12 += alpha_1 * gamma_1;
-    a_12 += gamma_2 * alpha_1;
-    a_12 += std::pow(gamma_3, 2);
-    a_12 += std::pow(gamma_4, 2);
-    a_12 += (21 / 64);
+    a_01 += alpha_0 * gamma_0;
+    a_01 += gamma_1 * alpha_1;
+    a_01 += std::pow(gamma_2, 2);
+    a_01 += std::pow(gamma_3, 2);
+    a_01 += (21 / 64);
 
+    a_02 += alpha_0 * gamma_0;
+    a_02 += std::pow(gamma_1, 2);
+    a_02 += gamma_2 * alpha_2;
+    a_02 += (85 / 256);
+
+    a_03 += alpha_0 * gamma_0;
+    a_03 += std::pow(gamma_1, 2);
+    a_03 += gamma_3 * alpha_3;
+    a_03 += (85 / 256);
+    
+    a_12 += std::pow(gamma_0, 2);
+    a_12 += alpha_1 * gamma_1;
+    a_12 += gamma_2 * alpha_2;
+    a_12 += (85 / 256);
+
+    a_13 += std::pow(gamma_0, 2);
     a_13 += alpha_1 * gamma_1;
-    a_13 += std::pow(gamma_2, 2);
     a_13 += gamma_3 * alpha_3;
     a_13 += (85 / 256);
 
-    a_14 += alpha_1 * gamma_1;
-    a_14 += std::pow(gamma_2, 2);
-    a_14 += gamma_4 * alpha_4;
-    a_14 += (85 / 256);
-    
     a_23 += std::pow(gamma_0, 2);
-    a_23 += alpha_1 * gamma_1;
-    a_23 += gamma_2 * alpha_2;
-    a_23 += (85 / 256);
-
-    a_24 += std::pow(gamma_0, 2);
-    a_24 += alpha_1 * gamma_1;
-    a_24 += gamma_3 * alpha_3;
-    a_24 += (85 / 256);
-
-    a_34 += std::pow(gamma_0, 2);
-    a_34 += std::pow(gamma_1, 2);
-    a_34 += (1 / 64);
+    a_23 += std::pow(gamma_1, 2);
+    a_23 += (1 / 64);
 
     A << 
-        a_11, a_12, a_13, a_14,
-        a_12, a_22, a_23, a_24,
-        a_13, a_23, a_33, a_34,
-        a_14, a_24, a_34, a_44;
+        a_00, a_01, a_02, a_03,
+        a_01, a_11, a_12, a_13,
+        a_02, a_12, a_22, a_23,
+        a_03, a_13, a_23, a_33;
 }
 
 void WT_GET_B(
+    const double n_0,
+    const double n_1,
     Eigen::Vector4d& B
 ) {
-    const double alpha_0 = WT_Coefficient_Alpha(0);
-    const double alpha_1 = WT_Coefficient_Alpha(1);
+    const double alpha_0 = WT_Coefficient_Alpha(n_0);
+    const double alpha_1 = WT_Coefficient_Alpha(n_1);
 
-    const double gamma_0 = WT_Coefficient_Gamma(0);
-    const double gamma_1 = WT_Coefficient_Gamma(1);
+    const double gamma_0 = WT_Coefficient_Gamma(n_0);
+    const double gamma_1 = WT_Coefficient_Gamma(n_1);
     
-    const double delta_0 = WT_Coefficient_Delta(0);
-    const double delta_1 = WT_Coefficient_Delta(1);
+    const double delta_0 = WT_Coefficient_Delta(n_0);
+    const double delta_1 = WT_Coefficient_Delta(n_1);
 
+    double b_0 = 0;
     double b_1 = 0;
     double b_2 = 0;
-    double b_3 = 0;
 
-    b_1 += alpha_0 * delta_0;
-    b_1 += gamma_1 * delta_1;
+    b_0 += alpha_0 * delta_0;
+    b_0 += gamma_1 * delta_1;
+    b_0 += (3 / 8);
+
+    b_1 += gamma_0 * delta_0;
+    b_1 += alpha_1 * delta_1;
     b_1 += (3 / 8);
 
     b_2 += gamma_0 * delta_0;
-    b_2 += alpha_1 * delta_1;
-    b_2 += (3 / 8);
-
-    b_3 += gamma_0 * delta_0;
-    b_3 += gamma_1 * delta_1;
-    b_3 += (1 / 8);
+    b_2 += gamma_1 * delta_1;
+    b_2 += (1 / 8);
 
     B << 
+        b_0,
         b_1,
         b_2,
-        b_3,
-        b_3;
+        b_2;
 }
 
 void WT_Solve_Weights(
@@ -403,7 +404,7 @@ void WT_Solve_Weights(
     WT_Get_A(n_0, n_1, n_2, n_3, A);
 
     Eigen::Vector4d B;
-    WT_GET_B(B);
+    WT_GET_B(n_0, n_1, B);
 
     W = A.inverse() * B;
 }   
