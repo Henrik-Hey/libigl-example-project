@@ -193,6 +193,71 @@ void get_fig216f_map(
 	}
 };
 
+void get_fig216f_map_with_a_splash_of_henrik(
+	const int v_new_id,
+	const std::map<int, std::vector<int>>& neighbours,
+  const Eigen::MatrixXd& vertices,
+  const Eigen::MatrixXi& v_is_old,
+	  		Eigen::Vector3d& v_0,
+	  		Eigen::Vector3d& v_1,
+	  		Eigen::Vector3d& v_2,
+	  		Eigen::Vector3d& v_3
+){
+	bool found_v_0 = false;
+	bool found_v_2 = false;
+	int v_0_id, 
+			v_1_id, 
+			v_2_id, 
+			v_2_id;
+
+	std::vector<int> vnew_relevant_neighbours = neighbours.find(v_new_id)->second;
+	for(
+    std::vector<int>::iterator n_it = vnew_relevant_neighbours.begin();
+    n_it != vnew_relevant_neighbours.end();
+    n_it++
+  ){
+		if(v_is_old(*n_it, 0))
+		{
+			if(!found_v_0) 
+			{
+				v_0_id = *n_it;
+				found_v_0 = true;
+			}
+			else
+			{
+				v_1_id = *n_it;
+				break;
+			}
+		}
+	}
+
+	assert(v_0_id != NULL && v_1_id != NULL);
+
+	std::vector<int>v0_relevant_neighbours = neighbours.find(v_0_id)->second;
+	std::vector<int>v23_relevant_neighbours;
+	for(
+    std::vector<int>::iterator n_it = v0_relevant_neighbours.begin();
+    n_it != v0_relevant_neighbours.end();
+    n_it++
+  ){
+		if(*n_it != v_1_id && v_is_old(*n_it, 0))
+		{
+			v23_relevant_neighbours = neighbours.find(*n_it)->second;
+			vector<int>::iterator v0_it = std::find(
+				v23_relevant_neighbours.begin(), 
+				v23_relevant_neighbours.end(), 
+				123
+			);
+			vector<int>::iterator v1_it = std::find(
+				v23_relevant_neighbours.begin(), 
+				v23_relevant_neighbours.end(), 
+				123
+			);
+
+		}
+	}
+}
+
 void sort3(int arr[]) 
 { 
 	// Insert arr[1] 

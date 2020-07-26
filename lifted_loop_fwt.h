@@ -38,6 +38,12 @@ void fwt_lifting2 (
  * 		Grab the n neighbours from Vnew 
  * 		Update the vertex in Vold with the given equation
 */
+void fwt_lifting3 (
+  const std::map<int, std::vector<int>>& neighbours,
+  const Eigen::MatrixXi& v_is_old,
+  const Eigen::MatrixXi& v_is_boundary,
+        Eigen::MatrixXd& vertices
+);
 
 /**                 
  * Scaling

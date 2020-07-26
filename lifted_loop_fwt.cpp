@@ -140,7 +140,6 @@ void fwt_lifting3 (
       }
     }
   }
-
 }
 
 void fwt_lifting5 (
