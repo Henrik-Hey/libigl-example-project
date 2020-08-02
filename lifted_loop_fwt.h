@@ -28,7 +28,7 @@ void fwt_lifting2 (
 );
 
 /**                 
- * Lifting III
+ * Lifting III: Update interior vertices in Vold with 1-ring neigbours in Vnew
  * Note: we make the assumption that we are updating
  * both boundary and interior vertices in Vold by 
  * vertices in Vnew, not just the interior vertices.
@@ -46,7 +46,7 @@ void fwt_lifting3 (
 );
 
 /**                 
- * Scaling
+ * Scaling: Scale the interior vertices in Vold
  * For each interior vertex in Vold
  * 		Get the valence of the current interior vertex from Vold
  * 		Update the position of the vertex by scaling it by the given scalar
@@ -60,7 +60,8 @@ void fwt_scaling (
 );
 
 /**                 
- * Lifting IV
+ * Lifting IV: Update interior verices in Vnew with the specified (fig)
+ * 						 neighbouring vertices in Vold (either boundary or interior)
  * For each interior vertex in Vnew
  * 		Grab the 4 vertices in Vold which enclose the interior vertex of Vnew
  * 		Update the position of the interior vertex in Vnew by the given equation
@@ -73,7 +74,7 @@ void fwt_lifting4 (
 );
 
 /**                 
- * Lifting V
+ * Lifting V: Update boundary verts in Vold with boundary verts in Vnew
  * For each boundary vertex in Vnew
  * 		Grab the 4 vertices in Vold specified by Fig2.16e
  * 		Update the values of those 4 vertices by the given equation
@@ -85,7 +86,8 @@ void fwt_lifting5 (
 );
 
 /**                 
- * Lifting VI
+ * Lifting VI: Update either boundary or interior verts in Vold
+ * 						 with an interior vertex in Vnew
  * For each interior vertex in Vnew
  * 		Grab the 4 Vold enclosing vertices
  * 		For each of the enclosing vertices (i=1,2,3,4)

@@ -26,7 +26,7 @@ bool is_quadrisection(
 	std::vector<std::vector<int>> sub_meshes; // Sets of tile soups!
   connected_components(tiles, sub_meshes);
 	std::cout << "Completed connected components" << std::endl;
-	std::cout << "Number of candidates: " << sub_meshes.size() << std::endl;
+	std::cout << "Number of candidate CCs: " << sub_meshes.size() << std::endl;
 
 	// Find a candidate connected component
 	for(auto it=sub_meshes.begin(); it!=sub_meshes.end(); it++)
@@ -83,7 +83,10 @@ void covering_mesh(
 			int nt2 = incident_faces[e2][0]==f ? incident_faces[e2][1] : incident_faces[e2][0];
 			int nt3 = incident_faces[e3][0]==f ? incident_faces[e3][1] : incident_faces[e3][0];
 
-			// Get tile vertices
+			// Get tile vertices. We need to make sure
+			// that we preserve the orientation of the tile
+			// by storing them in a counter-clockwise over the
+			// four faces that construct the tile
 			int v1p, v2p, v3p;
 			for(int i=0; i<3; i++)
 			{
@@ -109,7 +112,7 @@ void covering_mesh(
 			covered_faces(t, 3) = std::get<3>(neighbouring_faces[t]);
 		}
 	}
-	std::cout << "Num tiles: " << tiles.rows() << std::endl;
+	std::cout << "Num tiles found: " << tiles.rows() << std::endl;
 };
 
 void connected_components(

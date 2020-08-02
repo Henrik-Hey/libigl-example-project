@@ -51,6 +51,7 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
+  // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
   // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
   // const string mesh_path = repo_path + "knightloop.off";
   // igl::read_triangle_mesh(mesh_path,OV,OF);
@@ -104,8 +105,9 @@ int main(int argc, char * argv[])
       return true;
     };
 
-  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  std::cout << "Unleash the wavelets!" << std::endl;
 
   // HELPER FUNCTIONS FOR FWT
 
@@ -205,44 +207,44 @@ int main(int argc, char * argv[])
       V_copy
     );
 
-    fwt_lifting2(
-      bound_vnew_to_bound_volds,
-	    V_copy 
-    );
+    // fwt_lifting2(
+    //   bound_vnew_to_bound_volds,
+	  //   V_copy 
+    // );
 
-    fwt_lifting3(
-      neighbours_fine,
-      v_is_old,
-      v_is_boundary,
-      V_copy
-    );
+    // fwt_lifting3(
+    //   neighbours_fine,
+    //   v_is_old,
+    //   v_is_boundary,
+    //   V_copy
+    // );
 
-    fwt_scaling(
-      v_is_old,
-      v_is_boundary,
-      neighbours_fine,
-      V_copy
-    );
+    // fwt_scaling(
+    //   v_is_old,
+    //   v_is_boundary,
+    //   neighbours_fine,
+    //   V_copy
+    // );
 
-    fwt_lifting4 (
-      v_is_old,
-      v_is_boundary,
-      neighbours_fine,
-      V_copy
-    );
+    // fwt_lifting4 (
+    //   v_is_old,
+    //   v_is_boundary,
+    //   neighbours_fine,
+    //   V_copy
+    // );
   
-    fwt_lifting5 (
-      bound_vnew_to_bound_volds,
-      neighbours_coarse,
-      V_copy
-    );
+    // fwt_lifting5 (
+    //   bound_vnew_to_bound_volds,
+    //   neighbours_coarse,
+    //   V_copy
+    // );
 
-    fwt_lifting6 (
-      v_is_old,
-      v_is_boundary,
-      neighbours_fine,
-      V_copy
-    );
+    // fwt_lifting6 (
+    //   v_is_old,
+    //   v_is_boundary,
+    //   neighbours_fine,
+    //   V_copy
+    // );
 
     // END FWT
 
