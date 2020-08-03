@@ -131,7 +131,6 @@ int main(int argc, char * argv[])
 
     // Lifting 1
     // Generate all the edge and neighbour information in F_coarse.
-    // Note that all the vids will be referencing V_copy
     std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
     std::map<int, std::vector<int>> neighbours_coarse;
     edge_incident_faces(

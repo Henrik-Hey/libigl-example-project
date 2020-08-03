@@ -5,7 +5,7 @@
 
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& incident_faces
+	std::map<std::pair<int,int>, std::vector<int>>& edgemap
 ){
 	for(int f=0; f<F.rows(); f++)
 	{
@@ -13,20 +13,21 @@ void edge_incident_faces(
 		int v2 = F(f,1);
 		int v3 = F(f,2);
 
-		incident_faces[std::make_pair(std::min(v1,v2),std::max(v1,v2))].emplace_back(f);
-		incident_faces[std::make_pair(std::min(v2,v3),std::max(v2,v3))].emplace_back(f);
-		incident_faces[std::make_pair(std::min(v3,v1),std::max(v3,v1))].emplace_back(f);
+		edgemap[std::make_pair(std::min(v1,v2),std::max(v1,v2))].emplace_back(f);
+		edgemap[std::make_pair(std::min(v2,v3),std::max(v2,v3))].emplace_back(f);
+		edgemap[std::make_pair(std::min(v3,v1),std::max(v3,v1))].emplace_back(f);
 	}
 };
 
 void get_boundary_vertices(
-	const std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
+	const std::map<std::pair<int,int>, std::vector<int>>& edgemap,
 	std::vector<int>& boundary_vertices,
 	std::map<int, std::vector<int>>& neighbouring_vertices
 ){
-	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = incident_faces.begin();
-	while (it != incident_faces.end())
+	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap.begin();
+	while (it != edgemap.end())
 	{
+		// If the current edge only has one incident face
     if(it->second.size()==1)
     {
       int v1 = it->first.first;
@@ -49,11 +50,11 @@ void get_boundary_vertices(
 };
 
 void get_neighbours(
-	const std::map<std::pair<int,int>, std::vector<int>>& incident_faces,
+	const std::map<std::pair<int,int>, std::vector<int>>& edgemap,
 	std::map<int, std::vector<int>>& neighbouring_vertices
 ){
-	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = incident_faces.begin();
-	while (it != incident_faces.end())
+	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap.begin();
+	while (it != edgemap.end())
 	{
 		int v1 = it->first.first;
 		int v2 = it->first.second;
@@ -68,14 +69,14 @@ int find_boundary_vnew(
 	const int& vold2,
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
-	std::map<std::pair<int,int>, std::vector<int>> incident_faces // should be const
+	std::map<std::pair<int,int>, std::vector<int>> edgemap // should be const
 ){
 	
-	assert(incident_faces[std::make_pair(std::min(vold1, vold2), 
+	assert(edgemap[std::make_pair(std::min(vold1, vold2), 
 												std::max(vold1, vold2))].size()==1);
 
 	int v1new;
-	int coarse_face_id = incident_faces[std::make_pair(
+	int coarse_face_id = edgemap[std::make_pair(
 											 std::min(vold1, vold2), std::max(vold1, vold2))][0];
 	
 	int fid1, fid2, vid11, vid12, vid21, vid22;

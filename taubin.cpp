@@ -56,10 +56,13 @@ void covering_mesh(
 	std::vector<std::tuple<int, int, int, int>> neighbouring_faces;
 	for(int f=0; f<F_in.rows(); f++)
 	{
+		// We preserve the face orientation in vertices
 		int v1 = F_in(f,0);
 		int v2 = F_in(f,1);
 		int v3 = F_in(f,2);
 
+		// Here we do screw up the vertex orderings within an edge,
+		// but the edge ordering itself preserves the orientation
 		int e1v1 = std::min(v1,v2);
 		int e1v2 = std::max(v1,v2);
 		int e2v1 = std::min(v2,v3);
@@ -78,7 +81,11 @@ void covering_mesh(
 
 		if(isRegular)
 		{
-			// Neighbouring triangles to current triangle
+			// Construct and store the tile
+
+			// Find the neighbouring fids to current face
+			// Use edge ordering to preserve the face orientation
+			// by ordering the neighbouring triangles
 			int nt1 = incident_faces[e1][0]==f ? incident_faces[e1][1] : incident_faces[e1][0];
 			int nt2 = incident_faces[e2][0]==f ? incident_faces[e2][1] : incident_faces[e2][0];
 			int nt3 = incident_faces[e3][0]==f ? incident_faces[e3][1] : incident_faces[e3][0];
@@ -86,7 +93,10 @@ void covering_mesh(
 			// Get tile vertices. We need to make sure
 			// that we preserve the orientation of the tile
 			// by storing them in a counter-clockwise over the
-			// four faces that construct the tile
+			// four faces that construct the tile. 
+			// We carry the orientation from the neighbouring faces
+			// to the corresponding vertices, and so the 
+			// resulting tile has the correct orientation
 			int v1p, v2p, v3p;
 			for(int i=0; i<3; i++)
 			{
@@ -144,8 +154,6 @@ void connected_components(
 			if(where_are_you[tid1]!=where_are_you[tid2])
 			{
 				assert(where_are_you[tid1]!=NULL && where_are_you[2]!=NULL);
-
-				// where_are_you[tid1]->resize(where_are_you[tid1]->size()+where_are_you[tid2]->size());
 				where_are_you[tid1]->insert(
 					where_are_you[tid1]->end(),
 					where_are_you[tid2]->begin(),
