@@ -25,26 +25,34 @@ void get_boundary_vertices(
 	std::map<int, std::vector<int>>& neighbouring_vertices
 ){
 	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap.begin();
+	int v1, v2;
 	while (it != edgemap.end())
 	{
 		// If the current edge only has one incident face
+		/**
+		 * A boundary vertex if defined as a vertex
+		 * whose edge map contains exactly 2 
+		 * boundary edges (1 incident face) and 
+		 * no singular edges that form an open path
+		 * in the dual graph
+		*/
+    v1 = it->first.first;
+    v2 = it->first.second;
     if(it->second.size()==1)
     {
-      int v1 = it->first.first;
 			if( std::find(boundary_vertices.begin(), boundary_vertices.end(), v1) 
 					== boundary_vertices.end() 
 			){
 				boundary_vertices.emplace_back(v1);
 			}
-      int v2 = it->first.second;
 			if( std::find(boundary_vertices.begin(), boundary_vertices.end(), v2) 
 					== boundary_vertices.end() 
 			){
 				boundary_vertices.emplace_back(v2);
 			}
-			neighbouring_vertices[v1].emplace_back(v2);
-			neighbouring_vertices[v2].emplace_back(v1);
     }
+		neighbouring_vertices[v1].emplace_back(v2);
+		neighbouring_vertices[v2].emplace_back(v1);
 		it++;
   }
 };

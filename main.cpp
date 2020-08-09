@@ -129,26 +129,31 @@ int main(int argc, char * argv[])
     // viewer.data().set_face_based(true);
     // viewer.launch();
 
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
+    std::vector<int> boundary_vids_coarse;
+    std::map<int, std::vector<int>> neighbours_coarse;
+    std::map<int, std::vector<int>> bound_vnew_to_bound_volds;
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
+    std::map<int, std::vector<int>> neighbours_fine_boundary;
+    std::vector<int> boundary_vids_fine;
+    std::map<int, std::vector<int>> neighbours_fine;
+    Eigen::MatrixXi v_is_boundary = Eigen::MatrixXi::Zero(V.rows(),1);
+
     // Lifting 1
     // Generate all the edge and neighbour information in F_coarse.
-    std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
-    std::map<int, std::vector<int>> neighbours_coarse;
     edge_incident_faces(
       F_coarse,
       edgemap_coarse
     );
     // Figure out which Vold vids are boundary verts
-    std::vector<int> boundary_vids_coarse;
     get_boundary_vertices(
       edgemap_coarse, 
       boundary_vids_coarse,
       neighbours_coarse
     );
-
     // Lifting 2
     // Generate a map from Vnew boundary verts
     // to its neighbouring boundary verts in Vold
-    std::map<int, std::vector<int>> bound_vnew_to_bound_volds;
     map_bound_vnew_to_bound_vold(
       F,
       fids_covered_by_F_coarse,
@@ -157,11 +162,7 @@ int main(int argc, char * argv[])
       boundary_vids_coarse,
       bound_vnew_to_bound_volds
     );
-
     // Lifting 5
-    std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
-    std::map<int, std::vector<int>> neighbours_fine_boundary;
-    std::vector<int> boundary_vids_fine;
     edge_incident_faces(
       F,
       edgemap_fine
@@ -174,14 +175,11 @@ int main(int argc, char * argv[])
     // Assert we have a consistent number of boundary vert ids in vnew
     assert(boundary_vids_fine.size() - boundary_vids_coarse.size() 
             == bound_vnew_to_bound_volds.size());
-
     // Lifting 6 
-    std::map<int, std::vector<int>> neighbours_fine;
     get_neighbours(
       edgemap_fine,
       neighbours_fine
     );
-    Eigen::MatrixXi v_is_boundary = Eigen::MatrixXi::Zero(V.rows(),1);
     for(
       std::vector<int>::iterator it = boundary_vids_fine.begin();
       it != boundary_vids_fine.end();
@@ -191,7 +189,7 @@ int main(int argc, char * argv[])
       v_is_boundary(*it,0) = 1;
     }
 
-    // BEGIN FWT
+    // ---------------------------- BEGIN FWT ---------------------------- //
 
     // Make copy of V positions to mutate
     Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
@@ -245,7 +243,7 @@ int main(int argc, char * argv[])
     //   V_copy
     // );
 
-    // END FWT
+    // ---------------------------- END FWT ---------------------------- //
 
     // Visualize the output of the lifting schemes
     viewer.data().clear();
