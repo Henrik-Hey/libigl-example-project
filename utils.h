@@ -5,6 +5,16 @@
 #include <Eigen/Core>
 #include <map>
 
+
+void get_boundary_vert_structures(
+	const std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+	const Eigen::MatrixXi& v_is_old,
+	Eigen::MatrixXi& v_is_boundary,
+	std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	std::map<int, std::vector<int>>& boundary_vnew_to_vold_map
+);
+
+
 /**
  * Given input mesh, return a map with keys.
  * Each key is an ordered pair of vertex ids (v1 comes before v2 if v1 > v2)
@@ -14,6 +24,13 @@
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
 	std::map<std::pair<int,int>, std::vector<int>>& edgemap
+);
+
+
+void get_edgemap_and_neighbourhoods(
+	const Eigen::MatrixXi& F,
+	std::map<std::pair<int,int>, std::vector<int>>& edgemap,
+	std::map<int, std::vector<int>>& neighbours
 );
 
 /**

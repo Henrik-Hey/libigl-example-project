@@ -3,6 +3,45 @@
 #include <map>
 #include <vector>
 
+void get_boundary_vert_structures(
+	const std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+	const Eigen::MatrixXi& v_is_old,
+	Eigen::MatrixXi& v_is_boundary,
+	std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	std::map<int, std::vector<int>>& boundary_vnew_to_vold_map
+){
+	int v1, v2; // one will be in vnew and one in vold
+	v_is_boundary = Eigen::MatrixXi::Zero(v_is_old.rows(),1);
+	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap_fine.begin();
+	while (it != edgemap_fine.end())
+	{
+		// If the current edge only has one incident face
+    if(it->second.size()==1)
+    {
+			v1 = it->first.first;
+			v2 = it->first.second;
+			v_is_boundary(v1,0) = 1;
+			v_is_boundary(v2,0) = 1;
+			if(v_is_old(v1,0)==1)
+			{
+				assert(v_is_old(v2,0)==0);
+				// v1 is in vold and v2 is in vnew
+				boundary_vold_to_vnew_map[v1].emplace_back(v2);
+				boundary_vnew_to_vold_map[v2].emplace_back(v1);
+
+			}
+			else if(v_is_old(v2,0)==1)
+			{
+				assert(v_is_old(v1,0)==0);
+				// v2 is in vold and v1 is in vnew
+				boundary_vold_to_vnew_map[v2].emplace_back(v1);
+				boundary_vnew_to_vold_map[v1].emplace_back(v2);
+			}
+    }
+		it++;
+  }
+};
+
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
 	std::map<std::pair<int,int>, std::vector<int>>& edgemap
@@ -16,6 +55,30 @@ void edge_incident_faces(
 		edgemap[std::make_pair(std::min(v1,v2),std::max(v1,v2))].emplace_back(f);
 		edgemap[std::make_pair(std::min(v2,v3),std::max(v2,v3))].emplace_back(f);
 		edgemap[std::make_pair(std::min(v3,v1),std::max(v3,v1))].emplace_back(f);
+	}
+};
+
+void get_edgemap_and_neighbourhoods(
+	const Eigen::MatrixXi& F,
+	std::map<std::pair<int,int>, std::vector<int>>& edgemap,
+	std::map<int, std::vector<int>>& neighbours
+){
+	for(int f=0; f<F.rows(); f++)
+	{
+		int v1 = F(f,0);
+		int v2 = F(f,1);
+		int v3 = F(f,2);
+
+		edgemap[std::make_pair(std::min(v1,v2),std::max(v1,v2))].emplace_back(f);
+		edgemap[std::make_pair(std::min(v2,v3),std::max(v2,v3))].emplace_back(f);
+		edgemap[std::make_pair(std::min(v3,v1),std::max(v3,v1))].emplace_back(f);
+
+		neighbours[v1].emplace_back(v2);
+		neighbours[v1].emplace_back(v3);
+		neighbours[v2].emplace_back(v1);
+		neighbours[v2].emplace_back(v3);
+		neighbours[v3].emplace_back(v1);
+		neighbours[v3].emplace_back(v2);
 	}
 };
 

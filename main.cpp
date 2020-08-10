@@ -105,7 +105,7 @@ int main(int argc, char * argv[])
       return true;
     };
 
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   std::cout << "Unleash the wavelets!" << std::endl;
 
@@ -129,130 +129,103 @@ int main(int argc, char * argv[])
     // viewer.data().set_face_based(true);
     // viewer.launch();
 
-    // Lifting 1
-    // Generate all the edge and neighbour information in F_coarse.
+    // Make copy of V positions to mutate
+    Eigen::MatrixXd V_fine = Eigen::MatrixXd(V);
+    Eigen::MatrixXi F_fine = Eigen::MatrixXi(F);
+
+    // Get edge maps
     std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
     std::map<int, std::vector<int>> neighbours_coarse;
-    edge_incident_faces(
+    std::map<int, std::vector<int>> neighbours_fine;
+    get_edgemap_and_neighbourhoods(
       F_coarse,
-      edgemap_coarse
-    );
-    // Figure out which Vold vids are boundary verts
-    std::vector<int> boundary_vids_coarse;
-    get_boundary_vertices(
-      edgemap_coarse, 
-      boundary_vids_coarse,
+      edgemap_coarse,
       neighbours_coarse
     );
-
-    // Lifting 2
-    // Generate a map from Vnew boundary verts
-    // to its neighbouring boundary verts in Vold
-    std::map<int, std::vector<int>> bound_vnew_to_bound_volds;
-    map_bound_vnew_to_bound_vold(
+    get_edgemap_and_neighbourhoods(
       F,
-      fids_covered_by_F_coarse,
-      edgemap_coarse,
-      neighbours_coarse,
-      boundary_vids_coarse,
-      bound_vnew_to_bound_volds
-    );
-
-    // Lifting 5
-    std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
-    std::map<int, std::vector<int>> neighbours_fine_boundary;
-    std::vector<int> boundary_vids_fine;
-    edge_incident_faces(
-      F,
-      edgemap_fine
-    );
-    get_boundary_vertices(
-      edgemap_fine, 
-      boundary_vids_fine,
-      neighbours_fine_boundary
-    );
-    // Assert we have a consistent number of boundary vert ids in vnew
-    assert(boundary_vids_fine.size() - boundary_vids_coarse.size() 
-            == bound_vnew_to_bound_volds.size());
-
-    // Lifting 6 
-    std::map<int, std::vector<int>> neighbours_fine;
-    get_neighbours(
       edgemap_fine,
       neighbours_fine
     );
-    Eigen::MatrixXi v_is_boundary = Eigen::MatrixXi::Zero(V.rows(),1);
-    for(
-      std::vector<int>::iterator it = boundary_vids_fine.begin();
-      it != boundary_vids_fine.end();
-      it++
-    )
-    {
-      v_is_boundary(*it,0) = 1;
-    }
 
-    // BEGIN FWT
-
-    // Make copy of V positions to mutate
-    Eigen::MatrixXd V_copy = Eigen::MatrixXd(V);
-
-    // Call Lifting 1
+    // Lifting 1 & Lifting 2
+    Eigen::MatrixXi v_is_boundary;
+    std::map<int, std::vector<int>> boundary_vold_to_vnew_map;
+    std::map<int, std::vector<int>> boundary_vnew_to_vold_map;
+    get_boundary_vert_structures(
+      edgemap_fine, 
+      v_is_old,
+      v_is_boundary,
+      boundary_vold_to_vnew_map,
+      boundary_vnew_to_vold_map
+    );
     fwt_lifting1(
-      F,
-      fids_covered_by_F_coarse,
-      edgemap_coarse,
-      neighbours_coarse,
-      boundary_vids_coarse,
-      V_copy
+      boundary_vold_to_vnew_map,
+      V_fine
+    );
+    fwt_lifting2(
+      boundary_vnew_to_vold_map,
+	    V_fine 
     );
 
-    // fwt_lifting2(
-    //   bound_vnew_to_bound_volds,
-	  //   V_copy 
-    // );
+    // Lifting 3
+    fwt_lifting3(
+      neighbours_fine,
+      v_is_old,
+      v_is_boundary,
+      V_fine
+    );
 
-    // fwt_lifting3(
-    //   neighbours_fine,
-    //   v_is_old,
-    //   v_is_boundary,
-    //   V_copy
-    // );
+    // Scaling
+    fwt_scaling(
+      v_is_old,
+      v_is_boundary,
+      neighbours_coarse,
+      V_fine
+    );
 
-    // fwt_scaling(
-    //   v_is_old,
-    //   v_is_boundary,
-    //   neighbours_fine,
-    //   V_copy
-    // );
+    std::cout << V_fine << std::endl;
 
-    // fwt_lifting4 (
-    //   v_is_old,
-    //   v_is_boundary,
-    //   neighbours_fine,
-    //   V_copy
+    // Lifting 4
+    fwt_lifting4 (
+      v_is_old,
+      v_is_boundary,
+      neighbours_fine,
+      V_fine
+    );
+    std::cout << V_fine << std::endl;
+
+    // Lifting 5
+    // std::map<int, std::vector<int>> neighbours_fine_boundary;
+    // std::vector<int> boundary_vids_fine;
+    // get_boundary_vertices(
+    //   edgemap_fine, 
+    //   boundary_vids_fine,
+    //   neighbours_fine_boundary
     // );
-  
     // fwt_lifting5 (
-    //   bound_vnew_to_bound_volds,
-    //   neighbours_coarse,
-    //   V_copy
+    //   boundary_vnew_to_vold_map,
+    //   boundary_vold_to_vnew_map,
+    //   V_fine
     // );
+    // std::cout << V_fine << std::endl;
 
+    // // // Lifting 6 
     // fwt_lifting6 (
     //   v_is_old,
     //   v_is_boundary,
     //   neighbours_fine,
-    //   V_copy
+    //   V_fine
     // );
 
-    // END FWT
+    // std::cout << V_fine << std::endl;
 
     // Visualize the output of the lifting schemes
     viewer.data().clear();
-    viewer.data().set_mesh(V_copy,F);
+    viewer.data().set_mesh(V_fine,F);
     viewer.data().set_face_based(true);
     viewer.launch();
-
   }
   // Henrik takes nice photos
 }

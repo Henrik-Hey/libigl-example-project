@@ -8,9 +8,10 @@
 double WT_scale_common(
     const int n
 ) {
-    double p_1 = std::cos((2 * M_PI) / n);
-    double p_2 = (3 / 8) + ((1 / 4) * p_1); 
-    
+    assert(n!=0);
+    double p_1 = std::cos((2. * M_PI) / n);
+    // assert(p_1 != 0);
+    double p_2 = (3. / 8.) + ((1. / 4.) * p_1); 
     return std::pow(p_2, 2);
 }
 
@@ -127,7 +128,10 @@ void WT_Scaling(
     const double n,
     Eigen::Vector3d& v_prime 
 ) {
-    v_prime = v / ((8 / 5) * WT_scale_common(n));    
+    if(n==0) return;
+    double scale = WT_scale_common(n);
+    assert(scale != 0);
+    v_prime = v / ((8. / 5.) * scale);    
 }
 
 void WT_Scaling_inverse(
