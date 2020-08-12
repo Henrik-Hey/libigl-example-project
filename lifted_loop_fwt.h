@@ -74,6 +74,7 @@ void fwt_lifting4 (
 	const Eigen::MatrixXi& v_is_old,
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
+  const std::map<int, std::vector<int>>& neighbours_coarse,
 	Eigen::MatrixXd& V
 );
 
@@ -103,5 +104,6 @@ void fwt_lifting6 (
 	const Eigen::MatrixXi& v_is_old,
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
+  const std::map<int, std::vector<int>>& neighbours_coarse,
 	Eigen::MatrixXd& V
 );

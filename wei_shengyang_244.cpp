@@ -258,7 +258,7 @@ void WT_Get_A(
     const double n_1,
     const double n_2,
     const double n_3,
-    Eigen::MatrixX4d& A
+    Eigen::Matrix4d& A
 ) {
     // Coefficients
 
@@ -407,7 +407,7 @@ void WT_Solve_Weights(
     const double n_3,
     Eigen::Vector4d& W
 ) {
-    Eigen::MatrixX4d A;
+    Eigen::Matrix4d A;
     WT_Get_A(n_0, n_1, n_2, n_3, A);
 
     Eigen::Vector4d B;

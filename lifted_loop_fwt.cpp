@@ -78,7 +78,7 @@ void fwt_lifting3 (
     it++
   ){
     vold_int = it->first;
-    if(v_is_old(vold_int, 0) && !v_is_boundary(vold_int, 0))
+    if(v_is_old(vold_int, 0)==1 && v_is_boundary(vold_int, 0)==0)
     {
       vold_all_neighbours = it->second;
       vold_int_neighbours.clear();
@@ -135,6 +135,7 @@ void fwt_lifting4 (
 	const Eigen::MatrixXi& v_is_old,
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
+  const std::map<int, std::vector<int>>& neighbours_coarse,
 	Eigen::MatrixXd& V
 ){
   Eigen::Vector3d v_prime;
@@ -146,6 +147,7 @@ void fwt_lifting4 (
       get_fig216f_map_with_a_splash_of_henrik(
         v,
         neighbours_fine,
+        neighbours_coarse,
         v_is_old,
         v_0,
         v_1,
@@ -181,42 +183,41 @@ void fwt_lifting5 (
   ){
     assert(it->second.size()==2);
     
-    vnew = it->first;
-    // Following diagram in Fig2.16e
-    vold2 = it->second[0];
-    vold3 = it->second[1];
+    if(it->second.size()==2)
+    {
+      vnew = it->first;
+      // Following diagram in Fig2.16e
+      vold2 = it->second[0];
+      vold3 = it->second[1];
 
-    // Find coarse neighbours of vold 2 and vold 3
-    v2temp = boundary_vold_to_vnew_map.at(vold2)[0]==vnew ? 
-            boundary_vold_to_vnew_map.at(vold2)[1] : boundary_vold_to_vnew_map.at(vold2)[0];
-    vold1 = boundary_vnew_to_vold_map.at(v2temp)[0]==v2temp ? 
-            boundary_vnew_to_vold_map.at(v2temp)[1] : boundary_vold_to_vnew_map.at(v2temp)[0];
+      // Find coarse neighbours of vold 2 and vold 3
+      v2temp = boundary_vold_to_vnew_map.at(vold2)[0]==vnew ? 
+              boundary_vold_to_vnew_map.at(vold2)[1] : boundary_vold_to_vnew_map.at(vold2)[0];
+      vold1 = boundary_vnew_to_vold_map.at(v2temp)[0]==vold2 ? 
+              boundary_vnew_to_vold_map.at(v2temp)[1] : boundary_vnew_to_vold_map.at(v2temp)[0];
 
-    v3temp = boundary_vold_to_vnew_map.at(vold3)[0]==vnew ? 
-            boundary_vold_to_vnew_map.at(vold3)[1] : boundary_vold_to_vnew_map.at(vold3)[0];
-    vold4 = boundary_vnew_to_vold_map.at(v3temp)[0]==v3temp ? 
-            boundary_vnew_to_vold_map.at(v3temp)[1] : boundary_vold_to_vnew_map.at(v3temp)[0];
+      v3temp = boundary_vold_to_vnew_map.at(vold3)[0]==vnew ? 
+              boundary_vold_to_vnew_map.at(vold3)[1] : boundary_vold_to_vnew_map.at(vold3)[0];
+      vold4 = boundary_vnew_to_vold_map.at(v3temp)[0]==vold3 ? 
+              boundary_vnew_to_vold_map.at(v3temp)[1] : boundary_vnew_to_vold_map.at(v3temp)[0];
 
-    // assert(neighbours_coarse.at(vold3).size()==2);
-    // vold4 = neighbours_coarse.at(vold3)[0]==vold2 ? 
-    //         neighbours_coarse.at(vold3)[1] : neighbours_coarse.at(vold3)[0];
+      WT_Lifting_5(
+        Eigen::Vector3d(V.row(vnew)),
+        Eigen::Vector3d(V.row(vold1)),
+        Eigen::Vector3d(V.row(vold2)),
+        Eigen::Vector3d(V.row(vold3)),
+        Eigen::Vector3d(V.row(vold4)),
+        vold1_prime,
+        vold2_prime,
+        vold3_prime,
+        vold4_prime
+      );
 
-    WT_Lifting_5(
-      Eigen::Vector3d(V.row(vnew)),
-      Eigen::Vector3d(V.row(vold1)),
-      Eigen::Vector3d(V.row(vold2)),
-      Eigen::Vector3d(V.row(vold3)),
-      Eigen::Vector3d(V.row(vold4)),
-      vold1_prime,
-      vold2_prime,
-      vold3_prime,
-      vold4_prime
-    );
-
-    V.row(vold1) = vold1_prime;
-    V.row(vold2) = vold2_prime;
-    V.row(vold3) = vold3_prime;
-    V.row(vold4) = vold4_prime;
+      V.row(vold1) = vold1_prime;
+      V.row(vold2) = vold2_prime;
+      V.row(vold3) = vold3_prime;
+      V.row(vold4) = vold4_prime;
+    }
   }
   std::cout << "Completed FWT Lifting 5" << std::endl;
 };
@@ -225,17 +226,19 @@ void fwt_lifting6 (
 	const Eigen::MatrixXi& v_is_old,
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
+  const std::map<int, std::vector<int>>& neighbours_coarse,
 	Eigen::MatrixXd& V
 ){
   Eigen::Vector3d v_i_prime;
   int v_0, v_1, v_2, v_3;
   for(int v=0; v<V.rows(); v++)
   {
-    if(v_is_old(v,0)==0&&v_is_boundary(v,0)==0)
+    if(v_is_old(v,0)==0 && v_is_boundary(v,0)==0)
     {
       get_fig216f_map_with_a_splash_of_henrik(
         v,
         neighbours_fine,
+        neighbours_coarse,
         v_is_old,
         v_0,
         v_1,
@@ -243,10 +246,12 @@ void fwt_lifting6 (
         v_3
       );
 
-      std::cout <<  v_0 << std::endl;
-      std::cout <<  v_1 << std::endl;
-      std::cout <<  v_2 << std::endl;
-      std::cout <<  v_3 << std::endl;
+      std::cout << "m1" << std::endl;
+
+      std::cout << v_0 << std::endl;
+      std::cout << v_1 << std::endl;
+      std::cout << v_2 << std::endl;
+      std::cout << v_3 << std::endl;
 
       Eigen::Vector4d W;
       WT_Solve_Weights(
@@ -256,6 +261,7 @@ void fwt_lifting6 (
         neighbours_fine.at(v_3).size(),
         W
       );
+      std::cout << "m2" << std::endl;
 
       WT_Lifting_6(
         Eigen::Vector3d(V.row(v_0)), // vold

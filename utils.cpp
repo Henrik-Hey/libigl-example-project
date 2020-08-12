@@ -73,12 +73,20 @@ void get_edgemap_and_neighbourhoods(
 		edgemap[std::make_pair(std::min(v2,v3),std::max(v2,v3))].emplace_back(f);
 		edgemap[std::make_pair(std::min(v3,v1),std::max(v3,v1))].emplace_back(f);
 
-		neighbours[v1].emplace_back(v2);
-		neighbours[v1].emplace_back(v3);
-		neighbours[v2].emplace_back(v1);
-		neighbours[v2].emplace_back(v3);
-		neighbours[v3].emplace_back(v1);
-		neighbours[v3].emplace_back(v2);
+		if( std::find(neighbours[v1].begin(),neighbours[v1].end(),v2)==neighbours[v1].end()) 
+			neighbours[v1].emplace_back(v2);
+		if( std::find(neighbours[v1].begin(),neighbours[v1].end(),v3)==neighbours[v1].end()) 
+			neighbours[v1].emplace_back(v3);
+
+		if( std::find(neighbours[v2].begin(),neighbours[v2].end(),v1)==neighbours[v2].end()) 
+			neighbours[v2].emplace_back(v1);
+		if( std::find(neighbours[v2].begin(),neighbours[v2].end(),v3)==neighbours[v2].end()) 
+			neighbours[v2].emplace_back(v3);
+
+		if( std::find(neighbours[v3].begin(),neighbours[v3].end(),v2)==neighbours[v3].end()) 
+			neighbours[v3].emplace_back(v2);
+		if( std::find(neighbours[v3].begin(),neighbours[v3].end(),v1)==neighbours[v3].end()) 
+			neighbours[v3].emplace_back(v1);
 	}
 };
 
@@ -267,7 +275,8 @@ void get_fig216f_map(
 
 void get_fig216f_map_with_a_splash_of_henrik(
 	const int v_new_id,
-	const std::map<int, std::vector<int>>& neighbours,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	const std::map<int, std::vector<int>>& neighbours_coarse,
   const Eigen::MatrixXi& v_is_old,
 	  		int& v_0,
 	  		int& v_1,
@@ -276,12 +285,12 @@ void get_fig216f_map_with_a_splash_of_henrik(
 ){
 	bool found_v_0 = false;
 	bool found_v_2 = false;
-	int v_0_id = NULL, 
-			v_1_id = NULL, 
-			v_2_id = NULL, 
-			v_3_id = NULL;
+	int v_0_id = -1, 
+			v_1_id = -1, 
+			v_2_id = -1, 
+			v_3_id = -1;
 
-	std::vector<int> vnew_relevant_neighbours = neighbours.find(v_new_id)->second;
+	std::vector<int> vnew_relevant_neighbours = neighbours_fine.find(v_new_id)->second;
 	for(
     std::vector<int>::iterator n_it = vnew_relevant_neighbours.begin();
     n_it != vnew_relevant_neighbours.end();
@@ -302,9 +311,9 @@ void get_fig216f_map_with_a_splash_of_henrik(
 		}
 	}
 
-	assert(v_0_id != NULL && v_1_id != NULL);
+	assert(v_0_id != -1 && v_1_id != -1);
 
-	std::vector<int>v0_relevant_neighbours = neighbours.find(v_0_id)->second;
+	std::vector<int>v0_relevant_neighbours = neighbours_coarse.find(v_0_id)->second;
 	std::vector<int>v23_relevant_neighbours;
 	for(
     std::vector<int>::iterator n_it = v0_relevant_neighbours.begin();
@@ -313,7 +322,8 @@ void get_fig216f_map_with_a_splash_of_henrik(
   ){
 		if(*n_it != v_1_id && v_is_old(*n_it, 0))
 		{
-			v23_relevant_neighbours = neighbours.find(*n_it)->second;
+			// std::cout << "got here"  << std::endl;
+			v23_relevant_neighbours = neighbours_coarse.find(*n_it)->second;
 			if (
 				std::find(
 					v23_relevant_neighbours.begin(), 
@@ -332,13 +342,13 @@ void get_fig216f_map_with_a_splash_of_henrik(
 					}
 			}
 		}
-		if(v_2_id != NULL && v_3_id != NULL)
+		if(v_2_id != -1 && v_3_id != -1)
 		{
 			break;
 		}
 	}
 
-	assert(v_2_id != NULL && v_3_id != NULL);
+	assert(v_2_id != -1 && v_3_id != -1);
 
 	v_0 = v_0_id;
 	v_1 = v_1_id;

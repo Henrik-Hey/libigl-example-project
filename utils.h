@@ -90,7 +90,8 @@ void get_fig216f_map(
 
 void get_fig216f_map_with_a_splash_of_henrik(
 	const int v_new_id,
-	const std::map<int, std::vector<int>>& neighbours,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	const std::map<int, std::vector<int>>& neighbours_coarse,
   const Eigen::MatrixXi& v_is_old,
 	  		int& v_0,
 	  		int& v_1,
