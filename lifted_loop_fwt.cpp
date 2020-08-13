@@ -246,13 +246,6 @@ void fwt_lifting6 (
         v_3
       );
 
-      std::cout << "m1" << std::endl;
-
-      std::cout << v_0 << std::endl;
-      std::cout << v_1 << std::endl;
-      std::cout << v_2 << std::endl;
-      std::cout << v_3 << std::endl;
-
       Eigen::Vector4d W;
       WT_Solve_Weights(
         neighbours_fine.at(v_0).size(),
@@ -261,7 +254,6 @@ void fwt_lifting6 (
         neighbours_fine.at(v_3).size(),
         W
       );
-      std::cout << "m2" << std::endl;
 
       WT_Lifting_6(
         Eigen::Vector3d(V.row(v_0)), // vold

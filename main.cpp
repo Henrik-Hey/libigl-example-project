@@ -52,8 +52,8 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
-  // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
-  string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
+  // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
+  string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
   const string mesh_path = repo_path + "bobsubdiv1.obj";
   igl::read_triangle_mesh(mesh_path,OV,OF);
 
@@ -211,6 +211,8 @@ int main(int argc, char * argv[])
       }
     }
 
+    std::cout << "number of boundaries in fine: " << countNumNewBoundVerts+countNumOldBoundVerts << std::endl;
+
     for(
       std::map<std::pair<int,int>, std::vector<int>>::iterator it = edgemap_fine.begin();
       it!=edgemap_fine.end();
@@ -245,7 +247,6 @@ int main(int argc, char * argv[])
     // }
     // return 0;
 
-
     fwt_lifting1(
       boundary_vold_to_vnew_map,
       V_fine
@@ -268,7 +269,7 @@ int main(int argc, char * argv[])
     // std::cout << V_fine << std::endl;
     // return 0;
 
-    // // Scaling
+    // Scaling
     fwt_scaling(
       v_is_old,
       v_is_boundary,
@@ -290,9 +291,9 @@ int main(int argc, char * argv[])
     //     std::cout << V_fine.row(i) << std::endl; 
     //   }
     // }
-
     // std::cout << V_fine << std::endl;
-    // Lifting 4
+
+    // // Lifting 4
     // fwt_lifting4 (
     //   v_is_old,
     //   v_is_boundary,
@@ -301,21 +302,23 @@ int main(int argc, char * argv[])
     //   V_fine
     // );
     // // std::cout << V_fine << std::endl;
+
     // // Lifting 5
     // fwt_lifting5 (
     //   boundary_vnew_to_vold_map,
     //   boundary_vold_to_vnew_map,
     //   V_fine
     // );
-    // // std::cout << V_fine << std::endl;
-    // // Lifting 6 
-    // fwt_lifting6 (
-    //   v_is_old,
-    //   v_is_boundary,
-    //   neighbours_fine,
-    //   neighbours_coarse,
-    //   V_fine
-    // );
+
+    // Lifting 6 
+    fwt_lifting6 (
+      v_is_old,
+      v_is_boundary,
+      neighbours_fine,
+      neighbours_coarse,
+      V_fine
+    );
+    std::cout << V_fine << std::endl;
 
     // Visualize the output of the lifting schemes
     viewer.data().clear();
