@@ -4,10 +4,12 @@
 #include <map>
 #include "utils.h"
 #include "wei_shangyang_244.h"
+#include "taubin.h"
+
 
 void fwt_lifting1 (
-	std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
-	Eigen::MatrixXd& V
+	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	      Eigen::MatrixXd& V
 ){
   // Iterate over the vold boundary vertices, 
   // find its neighbouring Vnew bound verts and update
@@ -289,4 +291,191 @@ void fwt_lifting6 (
     }
   }
   std::cout << "Completed FWT Lifting 6" << std::endl;
+};
+
+void get_aux_data(
+  const Eigen::MatrixXd& V_fine,
+  const Eigen::MatrixXi& F_fine,
+  const Eigen::MatrixXi& F_coarse,
+  const Eigen::MatrixXi& v_is_old,
+        Eigen::MatrixXi& v_is_boundary,
+        std::map<std::pair<int,int>, std::vector<int>>& edgemap_coarse,
+        std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+        std::map<int, std::vector<int>>& neighbours_coarse,
+        std::map<int, std::vector<int>>& neighbours_fine,
+        std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+        std::map<int, std::vector<int>>& boundary_vnew_to_vold_map
+){
+  get_edgemap_and_neighbourhoods(
+    F_coarse,
+    edgemap_coarse,
+    neighbours_coarse
+  );
+  get_edgemap_and_neighbourhoods(
+    F_fine,
+    edgemap_fine,
+    neighbours_fine
+  );
+  get_boundary_vert_structures(
+    edgemap_fine, 
+    v_is_old,
+    v_is_boundary,
+    boundary_vold_to_vnew_map,
+    boundary_vnew_to_vold_map
+  );
+
+  // Sanity all the pre-lifting helper functions
+  int countNumNewBoundVerts = 0;
+  int countNumOldBoundVerts = 0;
+  for(int i=0; i<V_fine.rows(); i++)
+  {
+    if(v_is_old(i,0)==1 && v_is_boundary(i,0)==1)
+    {
+      countNumOldBoundVerts++;
+    } 
+    else if(v_is_old(i,0)==0 && v_is_boundary(i,0)==1)
+    {
+      countNumNewBoundVerts++;
+    }
+  }
+  std::cout << "number of boundaries in fine: " << countNumNewBoundVerts+countNumOldBoundVerts << std::endl;
+  for(
+    std::map<std::pair<int,int>, std::vector<int>>::iterator it = edgemap_fine.begin();
+    it!=edgemap_fine.end();
+    it++
+  ){
+    if(it->second.size()>2)
+      std::cout << "found irregular edge" << std::endl;
+  }
+  assert(boundary_vold_to_vnew_map.size()==countNumOldBoundVerts);
+  assert(boundary_vnew_to_vold_map.size()==countNumNewBoundVerts);
+  assert(neighbours_fine.size()==V_fine.rows());
+};
+
+void fwd_lifting_scheme(
+	const std::map<int, std::vector<int>>& neighbours_coarse,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	const std::map<int, std::vector<int>>& boundary_vnew_to_vold_map,
+	const Eigen::MatrixXi& v_is_boundary,
+	const Eigen::MatrixXi& v_is_old,
+				Eigen::MatrixXd& V_fine
+){
+	fwt_lifting1(
+		boundary_vold_to_vnew_map,
+		V_fine
+	);
+	fwt_lifting2(
+		boundary_vnew_to_vold_map,
+		V_fine 
+	);
+	Eigen::MatrixXd V_after_l2 = Eigen::MatrixXd(V_fine);
+	fwt_lifting3(
+		neighbours_fine,
+		v_is_old,
+		v_is_boundary,
+		V_fine
+	);
+	Eigen::MatrixXd V_after_l3 = Eigen::MatrixXd(V_fine);
+	if(V_after_l2==V_after_l3) std::cout << "L3 did nothing." << std::endl;
+	fwt_scaling(
+		v_is_old,
+		v_is_boundary,
+		neighbours_coarse,
+		V_fine
+	);
+	Eigen::MatrixXd V_after_scale = Eigen::MatrixXd(V_fine);
+	fwt_lifting4 (
+		v_is_old,
+		v_is_boundary,
+		neighbours_fine,
+		neighbours_coarse,
+		V_fine
+	);
+	fwt_lifting5 (
+		boundary_vnew_to_vold_map,
+		boundary_vold_to_vnew_map,
+		V_fine
+	);
+	fwt_lifting6 (
+		v_is_old,
+		v_is_boundary,
+		neighbours_fine,
+		neighbours_coarse,
+		V_fine
+	);
+	Eigen::MatrixXd V_after_l6 = Eigen::MatrixXd(V_fine);
+	if(V_after_scale==V_after_l6) std::cout << "L4-L6 collectively did nothing.";
+};
+
+void inv_lifting_scheme(
+	const std::map<int, std::vector<int>>& neighbours_coarse,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	const std::map<int, std::vector<int>>& boundary_vnew_to_vold_map,
+	const Eigen::MatrixXi& v_is_boundary,
+	const Eigen::MatrixXi& v_is_old,
+				Eigen::MatrixXd& V_fine
+) {
+  std::cout << "Someone, please implement me!!!!!" << std::endl;
+};
+
+bool FWT(
+  const Eigen::MatrixXi& F_fine,
+        Eigen::MatrixXi& F_coarse,
+        Eigen::MatrixXd& V_fine
+) {
+  Eigen::MatrixXi v_is_old; // Map vid to 1 if in Vold, and 0 if Vnew
+  Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
+  if(is_quadrisection(
+    F_fine, 
+    V_fine, 
+    v_is_old,
+    F_coarse,
+    fids_covered_by_F_coarse
+  )){
+    // Aux data structures needed for computing transform
+    Eigen::MatrixXi v_is_boundary;
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
+    std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
+    std::map<int, std::vector<int>> neighbours_coarse;
+    std::map<int, std::vector<int>> neighbours_fine;
+    std::map<int, std::vector<int>> boundary_vold_to_vnew_map;
+    std::map<int, std::vector<int>> boundary_vnew_to_vold_map;
+    get_aux_data(
+      V_fine,
+      F_fine,
+      F_coarse,
+      v_is_old,
+      v_is_boundary,
+      edgemap_coarse,
+      edgemap_fine,
+      neighbours_coarse,
+      neighbours_fine,
+      boundary_vold_to_vnew_map,
+      boundary_vnew_to_vold_map
+    );
+
+    // FWT time!
+    fwd_lifting_scheme(
+      neighbours_coarse,
+      neighbours_fine,
+      boundary_vold_to_vnew_map,
+      boundary_vnew_to_vold_map,
+      v_is_boundary,
+      v_is_old,
+      V_fine
+    );
+
+    inv_lifting_scheme(
+      neighbours_coarse,
+      neighbours_fine,
+      boundary_vold_to_vnew_map,
+      boundary_vnew_to_vold_map,
+      v_is_boundary,
+      v_is_old,
+      V_fine
+    );
+    return 1;
+  } else return 0;
 };

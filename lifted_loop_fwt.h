@@ -1,5 +1,6 @@
 #include <Eigen/Core>
 #include <vector>
+#include <map>
 
 /**
  * Lifting I: Update Vold boundary verts with Vnew boundary verts
@@ -7,17 +8,9 @@
  *    Grab the neighbouring boundary vertices in Vnew
  *    Update the boundary vertex in Vold with the given equation
 */
-// void fwt_lifting1 (
-// 	const Eigen::MatrixXi& F_fine,
-// 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
-//   const std::map<std::pair<int,int>, std::vector<int>>& edgemap_coarse,
-//   const std::map<int, std::vector<int>>& neighbours_coarse,
-//   const std::vector<int>& boundary_vids_coarse,
-// 	Eigen::MatrixXd& V
-// );
 void fwt_lifting1 (
-	std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
-	Eigen::MatrixXd& V
+	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+				Eigen::MatrixXd& V
 );
 
 /**
@@ -28,7 +21,7 @@ void fwt_lifting1 (
 */
 void fwt_lifting2 (
   const std::map<int, std::vector<int>>& bound_vnew_to_bound_volds,
-	Eigen::MatrixXd& V
+				Eigen::MatrixXd& V
 );
 
 /**                 
@@ -60,7 +53,7 @@ void fwt_scaling (
 	const Eigen::MatrixXi& v_is_old,
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_coarse,
-	Eigen::MatrixXd& V
+				Eigen::MatrixXd& V
 );
 
 /**                 
@@ -75,7 +68,7 @@ void fwt_lifting4 (
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
   const std::map<int, std::vector<int>>& neighbours_coarse,
-	Eigen::MatrixXd& V
+				Eigen::MatrixXd& V
 );
 
 /**                 
@@ -87,7 +80,7 @@ void fwt_lifting4 (
 void fwt_lifting5 (
 	const std::map<int, std::vector<int>>& boundary_vnew_to_vold_map,
 	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
-	Eigen::MatrixXd& V
+				Eigen::MatrixXd& V
 );
 
 /**                 
@@ -105,5 +98,45 @@ void fwt_lifting6 (
 	const Eigen::MatrixXi& v_is_boundary,
   const std::map<int, std::vector<int>>& neighbours_fine,
   const std::map<int, std::vector<int>>& neighbours_coarse,
-	Eigen::MatrixXd& V
+				Eigen::MatrixXd& V
+);
+
+void get_aux_data(
+  const Eigen::MatrixXd& V_fine,
+	const Eigen::MatrixXi& F_fine,
+  const Eigen::MatrixXi& F_coarse,
+  const Eigen::MatrixXi& v_is_old,
+  			Eigen::MatrixXi& v_is_boundary,
+        std::map<std::pair<int,int>, std::vector<int>>& edgemap_coarse,
+        std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
+        std::map<int, std::vector<int>>& neighbours_coarse,
+        std::map<int, std::vector<int>>& neighbours_fine,
+        std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+        std::map<int, std::vector<int>>& boundary_vnew_to_vold_map
+);
+
+void fwd_lifting_scheme(
+	const std::map<int, std::vector<int>>& neighbours_coarse,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	const std::map<int, std::vector<int>>& boundary_vnew_to_vold_map,
+	const Eigen::MatrixXi& v_is_boundary,
+	const Eigen::MatrixXi& v_is_old,
+				Eigen::MatrixXd& V_fine
+);
+
+void inv_lifting_scheme(
+	const std::map<int, std::vector<int>>& neighbours_coarse,
+	const std::map<int, std::vector<int>>& neighbours_fine,
+	const std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+	const std::map<int, std::vector<int>>& boundary_vnew_to_vold_map,
+	const Eigen::MatrixXi& v_is_boundary,
+	const Eigen::MatrixXi& v_is_old,
+				Eigen::MatrixXd& V_fine
+);
+
+bool FWT(
+  const Eigen::MatrixXi& F_fine,
+				Eigen::MatrixXi& F_coarse,
+				Eigen::MatrixXd& V_fine
 );

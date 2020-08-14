@@ -8,9 +8,9 @@
 bool is_quadrisection(
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXd& V_in,
-	Eigen::MatrixXi& v_is_old,
-	Eigen::MatrixXi& F_coarse,
-	Eigen::MatrixXi& fids_covered_by_F_coarse
+				Eigen::MatrixXi& v_is_old,
+				Eigen::MatrixXi& F_coarse,
+				Eigen::MatrixXi& fids_covered_by_F_coarse
 ){
   std::cout << "Num verts in input mesh: " << V_in.rows() << std::endl;
   std::cout << "Num faces in input mesh: " << F_in.rows() << std::endl;
@@ -33,7 +33,8 @@ bool is_quadrisection(
 	{
 		// Try to construct a bijection from current
 		// connect component to the input mesh
-		is_equivalence( F_in, V_in, *it, tiles, covered_faces, v_is_old, F_coarse, fids_covered_by_F_coarse );
+		is_equivalence( F_in, V_in, *it, tiles, covered_faces, 
+										v_is_old, F_coarse, fids_covered_by_F_coarse );
 		// Stop early as soon as we find a
 		// successful candidate
 		if(F_coarse.rows()>0) 
@@ -45,8 +46,8 @@ bool is_quadrisection(
 
 void covering_mesh(
 	const Eigen::MatrixXi& F_in,
- 	Eigen::MatrixXi& tiles, // num_tilesx3 matrix of vert ids in V_in
- 	Eigen::MatrixXi& covered_faces // # tiles x 4 matrix of fids in F_in
+				Eigen::MatrixXi& tiles,
+				Eigen::MatrixXi& covered_faces
 ){
 	std::map<std::pair<int,int>, std::vector<int>> incident_faces;
   edge_incident_faces(F_in, incident_faces);
@@ -127,7 +128,7 @@ void covering_mesh(
 
 void connected_components(
 	const Eigen::MatrixXi& tiles,
- 	std::vector<std::vector<int>>& sub_meshes // Vector of vectors containing tile ids in a single connected component found
+ 				std::vector<std::vector<int>>& sub_meshes
 ){
 	std::map<int, std::vector<int>*> where_are_you; // Which partition is the face in
 	for(int tid=0; tid<tiles.rows(); tid++)
@@ -198,15 +199,12 @@ void connected_components(
 void is_equivalence(
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXd& V_in,
-	// Tile indices that make up the candidate mesh.
 	const std::vector<int>& candidate,
-	// #tiles by 3 matrix of indices into V_in that
-	// make up each tile.
 	const Eigen::MatrixXi& tiles,
 	const Eigen::MatrixXi& covered_faces,
-	Eigen::MatrixXi& v_is_old,
-	Eigen::MatrixXi& F_coarse,
-	Eigen::MatrixXi& fids_covered_by_F_coarse
+				Eigen::MatrixXi& v_is_old,
+				Eigen::MatrixXi& F_coarse,
+				Eigen::MatrixXi& fids_covered_by_F_coarse
 ){
 	// First test
 	if(candidate.size()*4==F_in.rows())
