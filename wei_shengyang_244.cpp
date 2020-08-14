@@ -8,11 +8,9 @@
 double WT_scale_common(
     const int n
 ) {
-    assert(n!=0);
     double p_1 = std::cos((2. * M_PI) / n);
-    // assert(p_1 != 0);
-    double p_2 = (3. / 8.) + ((1. / 4.) * p_1); 
-    return std::pow(p_2, 2);
+    double p_2 = 0.375 + (0.25*p_1); 
+    return p_2*p_2;
 }
 
 /**
@@ -71,8 +69,7 @@ double scalar_delta(
     const int n
 ) {
     double n_1 = 1 / n;
-    double p_4 = 1 - ((8 / 5) * WT_scale_common(n));
-
+    double p_4 = 1 - ((8./5.) * WT_scale_common(n));
     return n_1 * p_4;
 }
 
@@ -123,17 +120,6 @@ void WT_Lifting_3_inverse(
  * n in Vold. The updated value of v` of v is given by
 */
 
-void WT_Scaling(
-    const Eigen::Vector3d v,
-    const double n,
-    Eigen::Vector3d& v_prime 
-) {
-    if(n==0) return;
-    double scale = WT_scale_common(n);
-    assert(scale != 0);
-    v_prime = v / ((8. / 5.) * scale);    
-}
-
 void WT_Scaling_inverse(
     const Eigen::Vector3d v_prime, 
     const double n,
@@ -156,8 +142,8 @@ void WT_Lifting_4(
     const Eigen::Vector3d v4,
     Eigen::Vector3d& v_prime
 ) {
-    const Eigen::Vector3d three_eigths = (3/8) * (v1 + v2);
-    const Eigen::Vector3d one_eigth = (1/8) * (v3 + v4); 
+    const Eigen::Vector3d three_eigths = (3./8.) * (v1 + v2);
+    const Eigen::Vector3d one_eigth = (1./8.) * (v3 + v4); 
 
     v_prime = v - (three_eigths + one_eigth); 
 }
@@ -170,8 +156,8 @@ void WT_Lifting_4_inverse(
     const Eigen::Vector3d v4,
     Eigen::Vector3d& v
 ) {
-    const Eigen::Vector3d three_eigths = (3/8) * (v1 + v2);
-    const Eigen::Vector3d one_eigth = (1/8) * (v3 + v4); 
+    const Eigen::Vector3d three_eigths = (3./8.) * (v1 + v2);
+    const Eigen::Vector3d one_eigth = (1./8.) * (v3 + v4); 
 
     v = v_prime + (three_eigths + one_eigth); 
 }
@@ -232,25 +218,39 @@ void WT_Lifting_5_inverse(
 double WT_Coefficient_Alpha(
     const double n
 ) {
-    return (3 / 8) + WT_scale_common(n); 
+  return (0.375) + WT_scale_common(n); 
+}
+
+void WT_Scaling(
+    const Eigen::Vector3d v,
+    const double n,
+    Eigen::Vector3d& v_prime 
+) {
+    // if(n==0) return;
+    // double scale = WT_scale_common(n);
+    // assert(scale != 0);
+
+    double beta = (WT_Coefficient_Alpha(n) - 0.375) / 0.625;
+    // v_prime = v / ((8. / 5.) * scale);    
+    v_prime = v / beta;    
 }
 
 double WT_Coefficient_Beta(
     const double n
 ) {
-    return (8 / 5) * WT_scale_common(n); 
+    return (1.6) * WT_scale_common(n); 
 }
 
 double WT_Coefficient_Gamma(
     const double n
 ) {
-    return (1 / n) * ((5 / 8) - WT_scale_common(n)); 
+    return (1. / n) * ((5./8.) - WT_scale_common(n)); 
 }
 
 double WT_Coefficient_Delta(
     const double n
 ) {
-    return (1 / n) * (1 - (8 / 5) * WT_scale_common(n)); 
+    return (1./n) * (1. - WT_Coefficient_Beta(n)); 
 }
 
 void WT_Get_A(
@@ -361,6 +361,40 @@ void WT_Get_A(
         a_01, a_11, a_12, a_13,
         a_02, a_12, a_22, a_23,
         a_03, a_13, a_23, a_33;
+
+    double n0d = static_cast<double>(n_0);
+    double n1d = static_cast<double>(n_1);
+    double n2d = static_cast<double>(n_2);
+    double n3d = static_cast<double>(n_3);
+
+    double alpha0 = WT_Coefficient_Alpha(n0d);
+    double alpha1 = WT_Coefficient_Alpha(n1d);
+    double alpha2 = WT_Coefficient_Alpha(n2d);
+    double alpha3 = WT_Coefficient_Alpha(n3d);
+
+    double gamma0 = WT_Coefficient_Gamma(n0d);
+    double gamma1 = WT_Coefficient_Gamma(n1d);
+    double gamma2 = WT_Coefficient_Gamma(n2d);
+    double gamma3 = WT_Coefficient_Gamma(n3d);
+
+    double delta0 = WT_Coefficient_Delta(n0d);
+    double delta1 = WT_Coefficient_Delta(n1d);
+
+    A(0, 0) = alpha0 * alpha0 + gamma1 * gamma1 + gamma2 * gamma2 + gamma3 * gamma3 + (n0d - 3.0) * 0.00390625 + n0d * (0.15625);
+    A(1, 1) = gamma0 * gamma0 + alpha1 * alpha1 + gamma2 * gamma2 + gamma3 * gamma3 + (n1d - 3.0) * 0.00390625 + n1d * (0.15625);
+    A(2, 2) = gamma0 * gamma0 + gamma1 * gamma1 + alpha2 * alpha2 + (n2d - 2.0) * 0.00390625 + n2d * (0.15625);
+    A(3, 3) = gamma0 * gamma0 + gamma1 * gamma1 + alpha3 * alpha3 + (n3d - 2.0) * 0.00390625 + n3d * (0.15625);
+    A(0, 1) = A(1, 0) = alpha0 * gamma0 + gamma1 * alpha1 + gamma2 * gamma2 + gamma3 * gamma3 + 0.328125;
+    A(0, 2) = A(2, 0) = alpha0 * gamma0 + gamma1 * gamma1 + gamma2 * alpha2 + 0.33203125;
+    A(0, 3) = A(3, 0) = alpha0 * gamma0 + gamma1 * gamma1 + gamma3 * alpha3 + 0.33203125;
+    A(1, 2) = A(2, 1) = gamma0 * gamma0 + alpha1 * gamma1 + alpha2 * gamma2 + 0.33203125;
+    A(1, 3) = A(3, 1) = gamma0 * gamma0 + alpha1 * gamma1 + alpha3 * gamma3 + 0.33203125;
+    A(2, 3) = A(3, 2) = gamma0 * gamma0 + gamma1 * gamma1 + 0.015625;
+
+
+    std::cout << "new A: " << std::endl;
+    std::cout << A << std::endl;
+
 }
 
 void WT_GET_B(
@@ -398,6 +432,30 @@ void WT_GET_B(
         b_1,
         b_2,
         b_2;
+
+    std::cout << "Got B: " << std::endl;
+    std::cout << B << std::endl;
+    std::cout << "-------" << std::endl;
+
+    double n0d = static_cast<double>(n_0);
+    double n1d = static_cast<double>(n_1);
+
+    double alpha0 = WT_Coefficient_Alpha(n0d);
+    double alpha1 = WT_Coefficient_Alpha(n1d);
+
+    double gamma0 = WT_Coefficient_Gamma(n0d);
+    double gamma1 = WT_Coefficient_Gamma(n1d);
+
+    double delta0 = WT_Coefficient_Delta(n0d);
+    double delta1 = WT_Coefficient_Delta(n1d);
+
+    B(0) = -(alpha0 * delta0 + gamma1 * delta1 + 0.375);
+    B(1) = -(gamma0 * delta0 + alpha1 * delta1 + 0.375);
+    B(2) = B(3) = -(gamma0 * delta0 + gamma1 * delta1 + 0.125);
+
+    std::cout << "Got New B: " << std::endl;
+    std::cout << B << std::endl;
+    std::cout << "-------" << std::endl;
 }
 
 void WT_Solve_Weights(
@@ -412,6 +470,12 @@ void WT_Solve_Weights(
 
     Eigen::Vector4d B;
     WT_GET_B(n_0, n_1, B);
+
+    std::cout << "Computing A and B" << std::endl;
+    std::cout << "valence v0 :" << n_0 << std::endl;
+    std::cout << "valence v1 :" << n_1 << std::endl;
+    std::cout << "valence v2 :" << n_2 << std::endl;
+    std::cout << "valence v3 :" << n_3 << std::endl;
 
     W = A.inverse() * B;
 }   

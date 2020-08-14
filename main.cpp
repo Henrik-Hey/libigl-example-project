@@ -52,9 +52,11 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
-  // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
-  string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
-  const string mesh_path = repo_path + "bobsubdiv1.obj";
+  // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
+  string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
+  const string mesh_path = repo_path + "spot.obj";
+  // const string mesh_path = repo_path + "loop_test_close4_6_18.off";
+  // const string mesh_path = repo_path + "torus_9_36.off";
   igl::read_triangle_mesh(mesh_path,OV,OF);
 
   V = OV;
@@ -106,7 +108,7 @@ int main(int argc, char * argv[])
   //   };
 
   std::cout << "Unleash the wavelets!" << std::endl;
-  // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
+  igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
@@ -135,7 +137,13 @@ int main(int argc, char * argv[])
   //   v_is_old(i,0) = visoldvec.at(i);
   // }
   // igl::read_triangle_mesh(repo_path+"knightloopcoarse.off",V,F_coarse);
-  
+
+  // viewer.data().clear();
+  // // viewer.data().set_mesh(V_fine,F_coarse);
+  // viewer.data().set_mesh(V,F);
+  // viewer.data().set_face_based(true);
+  // viewer.launch();
+
   if(is_quadrisection(
     F, 
     V, 
@@ -143,29 +151,6 @@ int main(int argc, char * argv[])
     F_coarse,
     fids_covered_by_F_coarse
   )){
-
-    // ofstream visold;
-    // ofstream fcoarse;
-    // visold.open (repo_path+"v_is_old.txt");
-    // fcoarse.open (repo_path+"f_coarse.txt");
-    // for(int f=0; f<F_coarse.rows(); f++)
-    // {
-    //   fcoarse << F_coarse.row(f) << std::endl;
-    // }
-    // for(int v=0; v<V.rows(); v++)
-    // {
-    //   visold << v_is_old(v,0) << std::endl;
-    // }
-    // visold.close();
-    // fcoarse.close();
-    // assert( visoldvec.size() == v_is_old.rows() );
-
-    // Display the coarser mesh that taubin extracts
-    // F = F_coarse;
-    // viewer.data().clear();
-    // viewer.data().set_mesh(V,F);
-    // viewer.data().set_face_based(true);
-    // viewer.launch();
 
     // Make copy of V positions to mutate
     Eigen::MatrixXd V_fine = Eigen::MatrixXd(V);
@@ -228,25 +213,6 @@ int main(int argc, char * argv[])
     assert(boundary_vnew_to_vold_map.size()==countNumNewBoundVerts);
     assert(neighbours_fine.size()==V_fine.rows());
 
-    // std::cout << "neighbours_fine: " << std::endl;
-    // for(
-    //   std::map<int, std::vector<int>>::iterator t = neighbours_fine.begin();
-    //   t != neighbours_fine.end();
-    //   t++
-    // )
-    // {
-    //   std::cout << "Print fine neighbourhood of vnew vert: " << t->first << std::endl;
-    //   for(
-    //     std::vector<int>::iterator t2 = t->second.begin();
-    //     t2 != t->second.end();
-    //     t2++
-    //   ){
-    //     std::cout << *t2 << std::endl;
-    //   }
-    //   std::cout << "------" << std::endl;
-    // }
-    // return 0;
-
     fwt_lifting1(
       boundary_vold_to_vnew_map,
       V_fine
@@ -266,8 +232,6 @@ int main(int argc, char * argv[])
       v_is_boundary,
       V_fine
     );
-    // std::cout << V_fine << std::endl;
-    // return 0;
 
     // Scaling
     fwt_scaling(
@@ -276,22 +240,6 @@ int main(int argc, char * argv[])
       neighbours_coarse,
       V_fine
     );
-    // for(int i=0; i<V_fine.rows(); i++)
-    // {
-    //   if(
-    //     std::abs(V_fine(i,0)) > 5 || 
-    //     std::abs(V_fine(i,1)) > 5 || 
-    //     std::abs(V_fine(i,2)) > 5
-    //   ){
-    //     std::cout << "vid " << i << " is an exception:" << std::endl; 
-    //     if(v_is_old(i,0)==1)
-    //     {
-    //       std::cout << "it has " << neighbours_coarse[i].size() << " neighbours:" << std::endl; 
-    //     }
-    //     std::cout << V_fine.row(i) << std::endl; 
-    //   }
-    // }
-    // std::cout << V_fine << std::endl;
 
     // // Lifting 4
     // fwt_lifting4 (
@@ -301,8 +249,7 @@ int main(int argc, char * argv[])
     //   neighbours_coarse,
     //   V_fine
     // );
-    // // std::cout << V_fine << std::endl;
-
+    
     // // Lifting 5
     // fwt_lifting5 (
     //   boundary_vnew_to_vold_map,
@@ -310,19 +257,19 @@ int main(int argc, char * argv[])
     //   V_fine
     // );
 
-    // Lifting 6 
-    fwt_lifting6 (
-      v_is_old,
-      v_is_boundary,
-      neighbours_fine,
-      neighbours_coarse,
-      V_fine
-    );
-    std::cout << V_fine << std::endl;
+    // // Lifting 6 
+    // fwt_lifting6 (
+    //   v_is_old,
+    //   v_is_boundary,
+    //   neighbours_fine,
+    //   neighbours_coarse,
+    //   V_fine
+    // );
 
     // Visualize the output of the lifting schemes
     viewer.data().clear();
     viewer.data().set_mesh(V_fine,F_coarse);
+    // viewer.data().set_mesh(OV,OF);
     viewer.data().set_face_based(true);
     viewer.launch();
   }
