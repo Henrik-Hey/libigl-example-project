@@ -120,16 +120,12 @@ void fwt_scaling (
   {
     if(v_is_old(v,0)==1&&v_is_boundary(v,0)==0)
     {
-      std::cout << "Vert to scale: " << V.row(v) << std::endl;
-      std::cout << "It's valence is: " << neighbours_coarse.at(v).size() << std::endl;
       WT_Scaling(
         Eigen::Vector3d(V.row(v)),
         neighbours_coarse.at(v).size(),
         v_prime 
       );
       V.row(v) = v_prime.transpose();
-      std::cout << "Gives v_prime: " << v_prime.transpose() << std::endl;
-      std::cout << "-----" << std::endl;
     }
   }
   std::cout << "Completed FWT Scaling" << std::endl;

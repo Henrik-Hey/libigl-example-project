@@ -52,8 +52,8 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
-  // string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
-  string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
+  // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
+  string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
   const string mesh_path = repo_path + "spot.obj";
   // const string mesh_path = repo_path + "loop_test_close4_6_18.off";
   // const string mesh_path = repo_path + "torus_9_36.off";
@@ -69,8 +69,7 @@ int main(int argc, char * argv[])
   //   4  Apply False barycentric subdivision
   // )";
   igl::opengl::glfw::Viewer viewer;
-  viewer.data().set_mesh(V,F);
-  viewer.data().set_face_based(true);
+
   // viewer.callback_key_down =
   //   [&](igl::opengl::glfw::Viewer & viewer, unsigned char key, int mod)->bool
   //   {
@@ -113,37 +112,9 @@ int main(int argc, char * argv[])
   // igl::loop( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
   // igl::upsample( Eigen::MatrixXd(V), Eigen::MatrixXi(F), V,F);
 
-  // Read in visold for knightloop
-  // std::vector<int> visoldvec;
-  // ifstream visold_in(repo_path+"v_is_old.txt");
-  // if (visold_in) {      
-  //   double value;
-  //   // read the elements in the file into a vector  
-  //   while ( visold_in >> value ) {
-  //     visoldvec.push_back(value);
-  //   }
-  // }
-  // visold_in.close();
-
-  // HELPER FUNCTIONS FOR FWT
   Eigen::MatrixXi v_is_old; // Map vid to 1 if in Vold, and 0 if Vnew
   Eigen::MatrixXi F_coarse; // Matrix whos e rows are vids in V_in that make up the coarse mesh
   Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
-
-  // v_is_old.resize(visoldvec.size(),1);
-  // int counter = 0;
-  // for(int i=0; i<visoldvec.size(); i++)
-  // {
-  //   v_is_old(i,0) = visoldvec.at(i);
-  // }
-  // igl::read_triangle_mesh(repo_path+"knightloopcoarse.off",V,F_coarse);
-
-  // viewer.data().clear();
-  // // viewer.data().set_mesh(V_fine,F_coarse);
-  // viewer.data().set_mesh(V,F);
-  // viewer.data().set_face_based(true);
-  // viewer.launch();
-
   if(is_quadrisection(
     F, 
     V, 
@@ -156,7 +127,7 @@ int main(int argc, char * argv[])
     Eigen::MatrixXd V_fine = Eigen::MatrixXd(V);
     Eigen::MatrixXi F_fine = Eigen::MatrixXi(F);
 
-    // Get edge maps
+    // Helper methods
     std::map<std::pair<int,int>, std::vector<int>> edgemap_coarse;
     std::map<std::pair<int,int>, std::vector<int>> edgemap_fine;
     std::map<int, std::vector<int>> neighbours_coarse;
@@ -182,6 +153,7 @@ int main(int argc, char * argv[])
       boundary_vnew_to_vold_map
     );
 
+    // Sanity all the pre-lifting helper functions
     int countNumNewBoundVerts = 0;
     int countNumOldBoundVerts = 0;
     for(int i=0; i<V_fine.rows(); i++)
@@ -195,9 +167,7 @@ int main(int argc, char * argv[])
         countNumNewBoundVerts++;
       }
     }
-
     std::cout << "number of boundaries in fine: " << countNumNewBoundVerts+countNumOldBoundVerts << std::endl;
-
     for(
       std::map<std::pair<int,int>, std::vector<int>>::iterator it = edgemap_fine.begin();
       it!=edgemap_fine.end();
@@ -208,63 +178,56 @@ int main(int argc, char * argv[])
         std::cout << "found irregular edge" << std::endl;
       }
     }
-
     assert(boundary_vold_to_vnew_map.size()==countNumOldBoundVerts);
     assert(boundary_vnew_to_vold_map.size()==countNumNewBoundVerts);
     assert(neighbours_fine.size()==V_fine.rows());
 
+    // Performing FWT
     fwt_lifting1(
       boundary_vold_to_vnew_map,
       V_fine
     );
-    // std::cout << V_fine << std::endl;
-
     fwt_lifting2(
       boundary_vnew_to_vold_map,
 	    V_fine 
     );
-    // std::cout << V_fine << std::endl;
-
-    // Lifting 3
+    Eigen::MatrixXd V_after_l2 = Eigen::MatrixXd(V_fine);
     fwt_lifting3(
       neighbours_fine,
       v_is_old,
       v_is_boundary,
       V_fine
     );
-
-    // Scaling
+    Eigen::MatrixXd V_after_l3 = Eigen::MatrixXd(V_fine);
+    if(V_after_l2==V_after_l3) std::cout << "L3 did nothing." << std::endl;
     fwt_scaling(
       v_is_old,
       v_is_boundary,
       neighbours_coarse,
       V_fine
     );
-
-    // // Lifting 4
-    // fwt_lifting4 (
-    //   v_is_old,
-    //   v_is_boundary,
-    //   neighbours_fine,
-    //   neighbours_coarse,
-    //   V_fine
-    // );
-    
-    // // Lifting 5
-    // fwt_lifting5 (
-    //   boundary_vnew_to_vold_map,
-    //   boundary_vold_to_vnew_map,
-    //   V_fine
-    // );
-
-    // // Lifting 6 
-    // fwt_lifting6 (
-    //   v_is_old,
-    //   v_is_boundary,
-    //   neighbours_fine,
-    //   neighbours_coarse,
-    //   V_fine
-    // );
+    Eigen::MatrixXd V_after_scale = Eigen::MatrixXd(V_fine);
+    fwt_lifting4 (
+      v_is_old,
+      v_is_boundary,
+      neighbours_fine,
+      neighbours_coarse,
+      V_fine
+    );
+    fwt_lifting5 (
+      boundary_vnew_to_vold_map,
+      boundary_vold_to_vnew_map,
+      V_fine
+    );
+    fwt_lifting6 (
+      v_is_old,
+      v_is_boundary,
+      neighbours_fine,
+      neighbours_coarse,
+      V_fine
+    );
+    Eigen::MatrixXd V_after_l6 = Eigen::MatrixXd(V_fine);
+    if(V_after_scale==V_after_l6) std::cout << "L4-L6 collectively did nothing.";
 
     // Visualize the output of the lifting schemes
     viewer.data().clear();

@@ -6,9 +6,9 @@
 void get_boundary_vert_structures(
 	const std::map<std::pair<int,int>, std::vector<int>>& edgemap_fine,
 	const Eigen::MatrixXi& v_is_old,
-	Eigen::MatrixXi& v_is_boundary,
-	std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
-	std::map<int, std::vector<int>>& boundary_vnew_to_vold_map
+				Eigen::MatrixXi& v_is_boundary,
+				std::map<int, std::vector<int>>& boundary_vold_to_vnew_map,
+				std::map<int, std::vector<int>>& boundary_vnew_to_vold_map
 ){
 	int v1, v2; // one will be in vnew and one in vold
 	v_is_boundary = Eigen::MatrixXi::Zero(v_is_old.rows(),1);
@@ -44,7 +44,7 @@ void get_boundary_vert_structures(
 
 void edge_incident_faces(
 	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& edgemap
+				std::map<std::pair<int,int>, std::vector<int>>& edgemap
 ){
 	for(int f=0; f<F.rows(); f++)
 	{
@@ -60,8 +60,8 @@ void edge_incident_faces(
 
 void get_edgemap_and_neighbourhoods(
 	const Eigen::MatrixXi& F,
-	std::map<std::pair<int,int>, std::vector<int>>& edgemap,
-	std::map<int, std::vector<int>>& neighbours
+				std::map<std::pair<int,int>, std::vector<int>>& edgemap,
+				std::map<int, std::vector<int>>& neighbours
 ){
 	for(int f=0; f<F.rows(); f++)
 	{
@@ -90,65 +90,12 @@ void get_edgemap_and_neighbourhoods(
 	}
 };
 
-void get_boundary_vertices(
-	const std::map<std::pair<int,int>, std::vector<int>>& edgemap,
-	std::vector<int>& boundary_vertices,
-	std::map<int, std::vector<int>>& neighbouring_vertices
-){
-	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap.begin();
-	int v1, v2;
-	while (it != edgemap.end())
-	{
-		// If the current edge only has one incident face
-		/**
-		 * A boundary vertex if defined as a vertex
-		 * whose edge map contains exactly 2 
-		 * boundary edges (1 incident face) and 
-		 * no singular edges that form an open path
-		 * in the dual graph
-		*/
-    v1 = it->first.first;
-    v2 = it->first.second;
-    if(it->second.size()==1)
-    {
-			if( std::find(boundary_vertices.begin(), boundary_vertices.end(), v1) 
-					== boundary_vertices.end() 
-			){
-				boundary_vertices.emplace_back(v1);
-			}
-			if( std::find(boundary_vertices.begin(), boundary_vertices.end(), v2) 
-					== boundary_vertices.end() 
-			){
-				boundary_vertices.emplace_back(v2);
-			}
-    }
-		neighbouring_vertices[v1].emplace_back(v2);
-		neighbouring_vertices[v2].emplace_back(v1);
-		it++;
-  }
-};
-
-void get_neighbours(
-	const std::map<std::pair<int,int>, std::vector<int>>& edgemap,
-	std::map<int, std::vector<int>>& neighbouring_vertices
-){
-	std::map<std::pair<int,int>, std::vector<int>>::const_iterator it = edgemap.begin();
-	while (it != edgemap.end())
-	{
-		int v1 = it->first.first;
-		int v2 = it->first.second;
-		neighbouring_vertices[v1].emplace_back(v2);
-		neighbouring_vertices[v2].emplace_back(v1);
-		it++;
-  }
-};
-
 int find_boundary_vnew(
 	const int& vold1,
 	const int& vold2,
 	const Eigen::MatrixXi& F_in,
 	const Eigen::MatrixXi& fids_covered_by_F_coarse,
-	std::map<std::pair<int,int>, std::vector<int>> edgemap // should be const
+				std::map<std::pair<int,int>, std::vector<int>> edgemap // should be const
 ){
 	
 	assert(edgemap[std::make_pair(std::min(vold1, vold2), 
@@ -196,81 +143,6 @@ int find_boundary_vnew(
 	else if(vid12==vid22) v1new = vid12;
 
 	return v1new;
-};
-
-void map_bound_vnew_to_bound_vold(
-	const Eigen::MatrixXi& F_fine,
-	const Eigen::MatrixXi& fids_covered_by_F_coarse,
-  const std::map<std::pair<int,int>, std::vector<int>>& edgemap_coarse,
-  const std::map<int, std::vector<int>>& neighbours_coarse,
-  const std::vector<int>& boundary_vids_coarse,
-	std::map<int, std::vector<int>>& bound_vnew_to_bound_volds
-){
-
-	// Iterate over each Vold boundary vert and 
-	// find the two Vnew verts that are its neighbours.
-	// While doing so, keep track of which boundary verts in Vold 
-	// neighbour the boundary Vnew verts
-
-  int v1new, v2new, vold;
-	for( // Iterate over the vold boundary vertices
-    std::vector<int>::const_iterator it = boundary_vids_coarse.begin();
-    it != boundary_vids_coarse.end();
-    it++
-  ){
-
-    // Get neighbouring vnew boundary vertex Number 1
-    assert(neighbours_coarse.at(*it).size()==2);
-
-    vold = *it;
-    v1new = find_boundary_vnew(
-      vold,
-      neighbours_coarse.at(*it)[0],
-      F_fine,
-      fids_covered_by_F_coarse,
-      edgemap_coarse
-    );
-    v2new = find_boundary_vnew(
-      vold,
-      neighbours_coarse.at(*it)[1],
-      F_fine,
-      fids_covered_by_F_coarse,
-      edgemap_coarse
-    );
-
-		bound_vnew_to_bound_volds[v1new].emplace_back(vold);
-		bound_vnew_to_bound_volds[v2new].emplace_back(vold);
-  }
-};
-
-void get_fig216f_map(
-	const Eigen::MatrixXi& v_is_old,
-	const Eigen::MatrixXi& v_is_boundary,
-	const std::map<int, std::vector<int>>& neighbours_fine,
-	std::map<int, std::vector<int>>& fig_216f_map
-){
-	assert(neighbours_fine.size()==v_is_boundary.rows());
-	for(int v=0; v<v_is_old.rows(); v++)
-	{
-		if(v_is_old(v,0)==0 && v_is_boundary(v,0)==0)
-		{
-			// Iterate over its neighbours and 
-			// store the ones that are in Vold
-			std::cout << neighbours_fine.at(v).size() <<std::endl;
-			for(
-				std::vector<int>::const_iterator it_n = neighbours_fine.at(v).begin();
-				it_n != neighbours_fine.at(v).end();
-				it_n++
-			){
-				if(v_is_old(*it_n,0)==1)
-				{
-					fig_216f_map[v].emplace_back(*it_n);
-				}
-			}
-			std::cout << fig_216f_map[v].size() << std::endl;
-			assert(fig_216f_map[v].size()==4);
-		}
-	}
 };
 
 void get_fig216f_map_with_a_splash_of_henrik(

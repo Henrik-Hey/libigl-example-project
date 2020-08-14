@@ -211,8 +211,6 @@ void is_equivalence(
 	// First test
 	if(candidate.size()*4==F_in.rows())
 	{
-		std::cout << "--Begin analyzing the candidate connected component--" << std::endl;
-
 		// Turn candidate into the proper F, V 
 		// matrix format so that we can quadrisect it
 		Eigen::MatrixXi submesh; // "Faces" from canadidate
