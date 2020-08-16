@@ -107,8 +107,8 @@ void WT_Lifting_3(
 }
 
 void WT_Lifting_3_inverse(
-	const Eigen::Vector3d v_prime,
 	const std::vector<Eigen::Vector3d> vertices,
+	const Eigen::Vector3d v_prime,
 				Eigen::Vector3d &v)
 {
 	v = v_prime + WT_Lifting_3_getScalarDeltaSum(vertices);
@@ -160,7 +160,7 @@ void WT_Lifting_4(
 }
 
 void WT_Lifting_4_inverse(
-				Eigen::Vector3d &v_prime,
+	const	Eigen::Vector3d v_prime,
 	const Eigen::Vector3d v1,
 	const Eigen::Vector3d v2,
 	const Eigen::Vector3d v3,

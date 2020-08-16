@@ -4,6 +4,7 @@
 
 #include <Eigen/Core>
 #include <map>
+#include <vector>
 
 
 void get_boundary_vert_structures(
