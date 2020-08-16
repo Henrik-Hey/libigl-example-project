@@ -511,33 +511,8 @@ void inv_lifting_scheme(
 		const Eigen::MatrixXi &v_is_old,
 		Eigen::MatrixXd &V_fine)
 {
-	std::cout << "Someone, please implement me!!!!!" << std::endl;
-	lifting1(
-			boundary_vold_to_vnew_map,
-			V_fine,
-			false);
-	lifting2(
-			boundary_vnew_to_vold_map,
-			V_fine,
-			false);
-	Eigen::MatrixXd V_after_l2 = Eigen::MatrixXd(V_fine);
-	lifting3(
-			neighbours_fine,
-			v_is_old,
-			v_is_boundary,
-			V_fine,
-			false);
-	Eigen::MatrixXd V_after_l3 = Eigen::MatrixXd(V_fine);
-	if (V_after_l2 == V_after_l3)
-		std::cout << "L3 did nothing." << std::endl;
-	fwt_scaling(
-			v_is_old,
-			v_is_boundary,
-			neighbours_coarse,
-			V_fine,
-			false);
-	Eigen::MatrixXd V_after_scale = Eigen::MatrixXd(V_fine);
-	lifting4(
+
+	lifting6(
 			v_is_old,
 			v_is_boundary,
 			neighbours_fine,
@@ -549,16 +524,34 @@ void inv_lifting_scheme(
 			boundary_vold_to_vnew_map,
 			V_fine,
 			false);
-	lifting6(
+	lifting4(
 			v_is_old,
 			v_is_boundary,
 			neighbours_fine,
 			neighbours_coarse,
 			V_fine,
 			false);
-	Eigen::MatrixXd V_after_l6 = Eigen::MatrixXd(V_fine);
-	if (V_after_scale == V_after_l6)
-		std::cout << "L4-L6 collectively did nothing.";
+	fwt_scaling(
+			v_is_old,
+			v_is_boundary,
+			neighbours_coarse,
+			V_fine,
+			false);
+	lifting3(
+			neighbours_fine,
+			v_is_old,
+			v_is_boundary,
+			V_fine,
+			false);
+	lifting2(
+			boundary_vnew_to_vold_map,
+			V_fine,
+			false);
+	lifting1(
+			boundary_vold_to_vnew_map,
+			V_fine,
+			false);
+	std::cout << "L4-L6 collectively did nothing.";
 };
 
 bool FWT(

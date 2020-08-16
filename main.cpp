@@ -98,10 +98,10 @@ int main(int argc, char * argv[])
             V_fine)
         ) {
           V = V_fine;
-          assert(F_coarse.rows() < F.rows());
-          F.resize(F_coarse.rows(), F_coarse.cols());
-          assert(F.rows() == F_coarse.rows());
-          F = F_coarse;
+          // assert(F_coarse.rows() < F.rows());
+          // F.resize(F_coarse.rows(), F_coarse.cols());
+          // assert(F.rows() == F_coarse.rows());
+          // F = F_coarse;
         }
         break;
       }
