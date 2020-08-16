@@ -51,6 +51,20 @@ int main(int argc, char * argv[])
   V = OV;
   F = OF;
 
+	Eigen::MatrixXi v_is_boundary;
+	std::map<std::pair<int, int>, std::vector<int>> edgemap_coarse;
+	std::map<std::pair<int, int>, std::vector<int>> edgemap_fine;
+	std::map<int, std::vector<int>> neighbours_coarse;
+	std::map<int, std::vector<int>> neighbours_fine;
+	std::map<int, std::vector<int>> boundary_vold_to_vnew_map;
+	std::map<int, std::vector<int>> boundary_vnew_to_vold_map;
+
+	Eigen::MatrixXd V_fine = Eigen::MatrixXd(V);
+	Eigen::MatrixXi F_fine = Eigen::MatrixXi(F);
+	Eigen::MatrixXi F_coarse;
+	Eigen::MatrixXi v_is_old;									// Map vid to 1 if in Vold, and 0 if Vnew
+	Eigen::MatrixXi fids_covered_by_F_coarse; // #F_coarse x 4 fids in F_in that that tile covers
+
   // Launch viewer
   igl::opengl::glfw::Viewer viewer;
   viewer.data().set_mesh(V,F);
@@ -87,23 +101,61 @@ int main(int argc, char * argv[])
       }
       case '4':
       {
-        // Make copy of V positions to mutate
-        Eigen::MatrixXd V_fine = Eigen::MatrixXd(V);
-        Eigen::MatrixXi F_fine = Eigen::MatrixXi(F);
-        Eigen::MatrixXi F_coarse;
-        if(
-          FWT(
-            F_fine,
-            F_coarse,
-            V_fine)
-        ) {
-          V = V_fine;
-          // assert(F_coarse.rows() < F.rows());
-          // F.resize(F_coarse.rows(), F_coarse.cols());
-          // assert(F.rows() == F_coarse.rows());
-          // F = F_coarse;
-        }
+
+				if (is_quadrisection(
+					F_fine,
+					V_fine,
+					v_is_old,
+					F_coarse,
+					fids_covered_by_F_coarse))
+				{
+
+					get_aux_data(
+						V_fine,
+						F_fine,
+						F_coarse,
+						v_is_old,
+						v_is_boundary,
+						edgemap_coarse,
+						edgemap_fine,
+						neighbours_coarse,
+						neighbours_fine,
+						boundary_vold_to_vnew_map,
+						boundary_vnew_to_vold_map);
+
+					// FWT time!
+					fwd_lifting_scheme(
+						neighbours_coarse,
+						neighbours_fine,
+						boundary_vold_to_vnew_map,
+						boundary_vnew_to_vold_map,
+						v_is_boundary,
+						v_is_old,
+						V_fine);
+				}
+
+				V = V_fine;
+				F = F_coarse;
+
         break;
+      }
+      case '5':
+			{
+
+				inv_lifting_scheme(
+					neighbours_coarse,
+					neighbours_fine,
+					boundary_vold_to_vnew_map,
+					boundary_vnew_to_vold_map,
+					v_is_boundary,
+					v_is_old,
+					V_fine
+				);
+
+				// V = V_fine;
+				F = F_fine;
+
+				break;
       }
     }
     viewer.data().clear();
