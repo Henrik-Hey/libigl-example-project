@@ -41,11 +41,12 @@ int main(int argc, char * argv[])
     7,6,1).finished().array()-1; // Test
 
   // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
-  string repo_path = "/home/michelle/Documents/LIBIGL/hackathon/libigl-example-project/";
+  string repo_path = "/home/gmin7/Documents/wavelets/libigl-example-project/";
   const string mesh_path = repo_path + "spot.obj";
   // const string mesh_path = repo_path + "loop_test_close4_6_18.off";
   // const string mesh_path = repo_path + "torus_9_36.off";
   igl::read_triangle_mesh(mesh_path,OV,OF);
+  igl::loop( Eigen::MatrixXd(OV), Eigen::MatrixXi(OF), OV,OF);
   igl::loop( Eigen::MatrixXd(OV), Eigen::MatrixXi(OF), OV,OF);
 
   V = OV;
@@ -69,6 +70,15 @@ int main(int argc, char * argv[])
   igl::opengl::glfw::Viewer viewer;
   viewer.data().set_mesh(V,F);
   viewer.data().set_face_based(true);
+  
+  Eigen::MatrixXd C = Eigen::MatrixXd(V);
+  for(int r=0; r<C.rows(); r++)
+  {
+    C.row(r) = Eigen::Vector3d(255./255., 119./255., 82./255.);
+  }
+
+  // Add per-vertex colors
+  viewer.data().set_colors(C);
 
   cout<<R"(Usage:
     1  Restore Original mesh
@@ -132,10 +142,58 @@ int main(int argc, char * argv[])
 						v_is_boundary,
 						v_is_old,
 						V_fine);
+
+          int countnew = 0;
+          for(int v=0; v<V_fine.rows(); v++)
+          {
+            if(v_is_old(v)==1) countnew++; 
+          }
+
+          std::cout << countnew << " hey there" << std::endl;
+
+          Eigen::MatrixXd tempVerts;
+          tempVerts.resize(countnew, 3);
+
+          std::map<int, int> vertMap;
+
+          int newCount = 0;
+          for(int v=0; v<V_fine.rows(); v++)
+          {
+            if(v_is_old(v)==1) {
+              tempVerts.row(newCount) = V_fine.row(v);
+              vertMap.insert({v,newCount});
+              std::cout << v << " maps to " << vertMap[v] << " " << std::endl;
+              newCount++;
+            }
+          }
+
+          for(int f=0; f<F_coarse.rows(); f++)
+          {
+
+
+            assert (F_coarse(f,0) < tempVerts.rows());
+            assert (F_coarse(f,1) < tempVerts.rows());
+            assert (F_coarse(f,2) < tempVerts.rows());
+
+            F_coarse(f,0) = vertMap[F_coarse(f,0)];
+            F_coarse(f,1) = vertMap[F_coarse(f,1)];
+            F_coarse(f,2) = vertMap[F_coarse(f,2)];
+          }
+
+          edgemap_coarse.clear();
+          edgemap_fine.clear();
+          neighbours_coarse.clear();
+          neighbours_fine.clear();
+          boundary_vold_to_vnew_map.clear();
+          boundary_vnew_to_vold_map.clear();
+
+          V_fine = Eigen::MatrixXd(tempVerts);
+          V = Eigen::MatrixXd(tempVerts);
+
+          F_fine = Eigen::MatrixXi(F_coarse);
+          F = Eigen::MatrixXi(F_coarse);
 				}
 
-				V = V_fine;
-				F = F_coarse;
 
         break;
       }
@@ -161,6 +219,13 @@ int main(int argc, char * argv[])
     viewer.data().clear();
     viewer.data().set_mesh(V,F);
     viewer.data().set_face_based(true);
+    Eigen::MatrixXd C = Eigen::MatrixXd(V);
+    for(int r=0; r<C.rows(); r++)
+    {
+      C.row(r) = Eigen::Vector3d(255./255., 119./255., 82./255.);
+    }
+    viewer.data().set_colors(C);
+
     return true;
   };
 
