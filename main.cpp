@@ -2,6 +2,7 @@
 #include <igl/loop.h>
 #include <igl/upsample.h>
 #include <igl/writeOFF.h>
+#include <igl/writeOBJ.h>
 #include <igl/false_barycentric_subdivision.h>
 #include <igl/opengl/glfw/Viewer.h>
 #include <Eigen/Core>
@@ -40,17 +41,20 @@ int main(int argc, char * argv[])
     7,5,6,
     7,6,1).finished().array()-1; // Test
 
+  int hi = 0;
+
   // string repo_path = "/Users/mihcelle/Documents/wavelets/libigl-example-project/";
   string repo_path = "/home/gmin7/Documents/wavelets/libigl-example-project/";
-  const string mesh_path = repo_path + "spot.obj";
+  const string mesh_path = repo_path + "bunny.obj";
   // const string mesh_path = repo_path + "loop_test_close4_6_18.off";
   // const string mesh_path = repo_path + "torus_9_36.off";
   igl::read_triangle_mesh(mesh_path,OV,OF);
   igl::loop( Eigen::MatrixXd(OV), Eigen::MatrixXi(OF), OV,OF);
-  igl::loop( Eigen::MatrixXd(OV), Eigen::MatrixXi(OF), OV,OF);
+
 
   V = OV;
   F = OF;
+  // writeOBJ(repo_path + "spotfinest.obj", V, F);
 
 	Eigen::MatrixXi v_is_boundary;
 	std::map<std::pair<int, int>, std::vector<int>> edgemap_coarse;
@@ -74,7 +78,7 @@ int main(int argc, char * argv[])
   Eigen::MatrixXd C = Eigen::MatrixXd(V);
   for(int r=0; r<C.rows(); r++)
   {
-    C.row(r) = Eigen::Vector3d(255./255., 119./255., 82./255.);
+    C.row(r) = Eigen::Vector3d(234./255., 119./255., 82./255.);
   }
 
   // Add per-vertex colors
@@ -192,6 +196,18 @@ int main(int argc, char * argv[])
 
           F_fine = Eigen::MatrixXi(F_coarse);
           F = Eigen::MatrixXi(F_coarse);
+
+          // if(hi == 1)
+          // {
+          //   writeOBJ(repo_path + "spotleastfine.obj", V, F);
+          // }
+          // else
+          // {
+          //   writeOBJ(repo_path + "spotfine.obj", V, F);
+          //   hi++;
+          // }
+
+
 				}
 
 
